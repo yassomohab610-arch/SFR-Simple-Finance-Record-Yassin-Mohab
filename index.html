@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SFR | Simple Finance Record</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #6366f1; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --danger: #ef4444; --success: #22c55e; --accent: #f1f5f9; }
+        body.dark { --bg: #020617; --card: #1e293b; --text: #f1f5f9; --accent: #334155; }
+        .privacy-active .blur-val { filter: blur(10px); transition: filter 0.3s ease; }
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.8s ease; }
+        .logo-anim { font-size: 80px; animation: pulse 2s infinite ease-in-out; }
+        .loading-bar { width: 180px; height: 4px; background: #334155; border-radius: 10px; margin-top: 25px; overflow: hidden; }
+        .loading-progress { width: 0%; height: 100%; background: var(--primary); animation: load 2.5s forwards; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+        @keyframes load { to { width: 100%; } }
+        #lock-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+        html, body { overflow-x: hidden; width: 100%; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); transition: all 0.3s ease; }
+        .app-container { display: none; padding: 15px; max-width: 1200px; margin: auto; }
+        .global-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 20px; border-radius: 24px; text-align: center; margin-bottom: 25px; }
+        .account-dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 25px; }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 20px; text-align: center; border: 1px solid var(--accent); }
+        .main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; width: 100%; }
+        @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } }
+        .card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--accent); margin-bottom: 20px; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; background: var(--bg); color: var(--text); box-sizing: border-box; }
+        .btn-primary { background: var(--primary); color: white; width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-tool { background: var(--accent); color: var(--text); margin: 3px; font-size: 0.8rem; padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; }
+        .item { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 16px; border-radius: 16px; margin-bottom: 10px; border: 1px solid var(--accent); border-left: 6px solid var(--primary); }
+        .rtl { direction: rtl; } .ltr { direction: ltr; }
+        
+        /* Footer Styling for Perfect Centering */
+        .footer-custom {
+            margin-top: 60px;
+            padding: 40px 20px;
+            border-top: 1px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* تجميع المحتوى في السنتر */
+            justify-content: center;
+            text-align: center; /* توسيط الكلام */
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body class="ltr">
+
+<div id="splash-screen">
+    <div class="logo-anim">💰</div>
+    <h1 style="color: white; margin: 15px 0 0 0; letter-spacing: 5px; font-size: 45px;">SFR</h1>
+    <p style="color: #94a3b8; font-size: 14px; margin-top: 5px; text-transform: uppercase; letter-spacing: 2px;">Simple Finance Record</p>
+    <div class="loading-bar"><div class="loading-progress"></div></div>
+</div>
+
+<div id="lock-screen">
+    <h2 style="margin-bottom: 20px;">🔐 SFR Locked</h2>
+    <input type="password" id="unlockPass" placeholder="Enter Password" style="width: 260px; text-align: center;">
+    <button class="btn-primary" style="width: 260px;" onclick="verifyLock()">Unlock App</button>
+</div>
+
+<audio id="splash-sound" src="https://www.soundjay.com/buttons/sounds/button-20.mp3"></audio>
+
+<div class="app-container" id="mainApp">
+    <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+        <h2 id="ui-title">SFR Dashboard</h2>
+        <div>
+            <button class="btn-tool" onclick="toggleLang()">🌐 AR/EN</button>
+            <button class="btn-tool" onclick="toggleTheme()">🌓</button>
+            <button class="btn-tool" onclick="togglePrivacy()">👁️</button>
+            <button class="btn-tool" id="btn-set-pass" onclick="setPass()">🔑 Set Pass</button>
+            <button class="btn-tool" id="btn-change-pass" onclick="changePass()" style="display:none;">⚙️ Edit</button>
+            <button class="btn-tool" id="btn-del-pass" onclick="deletePass()" style="display:none; color: var(--danger);">🗑️ Delete</button>
+            <button class="btn-tool" onclick="location.reload()">🔒 Lock</button>
+        </div>
+    </header>
+
+    <div class="global-stats">
+        <div><small id="ui-g-inc">Incomes</small><h3 id="val-g-inc" class="blur-val" style="color:var(--success)">0</h3></div>
+        <div><small id="ui-g-exp">Expenses</small><h3 id="val-g-exp" class="blur-val" style="color:var(--danger)">0</h3></div>
+        <div><small id="ui-g-net">Net Worth</small><h3 id="val-g-net" class="blur-val">0</h3></div>
+    </div>
+
+    <div class="account-dash">
+        <div class="stat-card"><small id="ui-init">Initial</small><h3 id="val-init" class="blur-val">0</h3></div>
+        <div class="stat-card"><small id="ui-inc">In</small><h3 id="val-inc" class="blur-val" style="color:var(--success)">0</h3></div>
+        <div class="stat-card"><small id="ui-exp">Out</small><h3 id="val-exp" class="blur-val" style="color:var(--danger)">0</h3></div>
+        <div class="stat-card" style="background: var(--primary); color: white;"><small id="ui-bal" style="color:#e0e7ff">Balance</small><h3 id="val-bal" class="blur-val">0</h3></div>
+    </div>
+
+    <div class="main-grid">
+        <div class="side">
+            <div class="card">
+                <select id="accSelect" onchange="switchAccount()"></select>
+                <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                    <button class="btn-tool" onclick="addAcc()">+ New</button>
+                    <button class="btn-tool" onclick="renameAcc()">✏️</button>
+                    <button class="btn-tool" onclick="delAcc()" style="color:var(--danger)">🗑️</button>
+                    <button class="btn-tool" onclick="modifyInitial()" style="background:#f59e0b; color:white">⚙️ Initial Balance</button>
+                </div>
+            </div>
+            <div class="card">
+                <form onsubmit="addEntry(event)">
+                    <select id="catSelect">
+                        <option value="🍔 Food & Dining">🍔 Food & Dining</option>
+                        <option value="🛒 Groceries">🛒 Groceries</option>
+                        <option value="🚗 Transport">🚗 Transport</option>
+                        <option value="🛍️ Shopping">🛍️ Shopping</option>
+                        <option value="📱 Bills & Phone">📱 Bills & Phone</option>
+                        <option value="🏠 Rent & Home">🏠 Rent & Home</option>
+                        <option value="💊 Health & Med">💊 Health & Med</option>
+                        <option value="🎓 Education">🎓 Education</option>
+                        <option value="🎮 Entertainment">🎮 Entertainment</option>
+                        <option value="✈️ Travel">✈️ Travel</option>
+                        <option value="📈 Investment">📈 Investment</option>
+                        <option value="💰 Salary">💰 Salary</option>
+                        <option value="➕ Other">➕ Other</option>
+                    </select>
+                    <input id="descInp" placeholder="Description">
+                    <input type="number" id="amtInp" placeholder="Amount" step="0.01" required>
+                    <select id="typeInp">
+                        <option value="expense">Expense (-)</option>
+                        <option value="income">Income (+)</option>
+                    </select>
+                    <button class="btn-primary" id="ui-save">Post to SFR</button>
+                </form>
+            </div>
+        </div>
+        <div class="content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+                <h3 id="ui-hist">History</h3>
+                <select id="monthFilter" style="width:auto; margin:0" onchange="render()"></select>
+            </div>
+            <div id="transList"></div>
+        </div>
+    </div>
+
+    <footer class="footer-custom">
+        <p style="margin: 5px 0; color: #64748b; font-size: 1.1rem;">Designed & Developed by</p>
+        <p style="margin: 5px 0; color: var(--text); font-size: 1.3rem; font-weight: 700;">Yassin Mohab Mohamed</p>
+        <p style="margin: 15px 0 5px 0; color: #94a3b8; font-size: 0.85rem; letter-spacing: 1px;">© 2025 SFR - SIMPLE FINANCE RECORD | v6.4</p>
+    </footer>
+</div>
+
+<script>
+    const APP_VERSION = "6.4";
+    let lang = localStorage.getItem("sfr_lang") || "en";
+    let theme = localStorage.getItem("sfr_theme") || "light";
+    let privacy = localStorage.getItem("sfr_privacy") === "true";
+    let currentIdx = 0;
+    let accounts = JSON.parse(localStorage.getItem("sfr_v6_data")) || [{ name: "Main Account", initial: 0, transactions: [] }];
+    let sfrPass = localStorage.getItem("sfr_v6_pass");
+
+    const dict = { 
+        en: { title:"SFR Dashboard", gInc:"Incomes", gExp:"Expenses", gNet:"Net Worth", init:"Initial", inc:"In", exp:"Out", bal:"Balance", hist:"History", save:"Post to SFR" }, 
+        ar: { title:"لوحة تحكم SFR", gInc:"الدخل", gExp:"المصاريف", gNet:"الثروة", init:"البداية", inc:"دخل", exp:"خرج", bal:"الرصيد", hist:"السجل", save:"حفظ في SFR" } 
+    };
+    const categories = ["🍔 Food & Dining", "🛒 Groceries", "🚗 Transport", "🛍️ Shopping", "📱 Bills & Phone", "🏠 Rent & Home", "💊 Health & Med", "🎓 Education", "🎮 Entertainment", "✈️ Travel", "📈 Investment", "💰 Salary", "➕ Other"];
+
+    window.onload = () => {
+        if (theme === "dark") document.body.classList.add("dark");
+        if (privacy) document.getElementById("mainApp").classList.add("privacy-active");
+        setTimeout(() => {
+            document.getElementById("splash-screen").style.opacity = "0";
+            setTimeout(() => {
+                document.getElementById("splash-screen").style.display = "none";
+                if(sfrPass) document.getElementById("lock-screen").style.display = "flex";
+                else { document.getElementById("mainApp").style.display = "block"; render(); }
+                document.getElementById("splash-sound").play().catch(()=>{});
+                updateButtons(); populateMonths(); updateUI();
+            }, 800);
+        }, 2500);
+    };
+
+    function save() { localStorage.setItem("sfr_v6_data", JSON.stringify(accounts)); }
+    function toggleLang() { lang = lang === "en" ? "ar" : "en"; localStorage.setItem("sfr_lang", lang); updateUI(); }
+    function toggleTheme() { document.body.classList.toggle("dark"); theme = document.body.classList.contains("dark") ? "dark" : "light"; localStorage.setItem("sfr_theme", theme); }
+    function togglePrivacy() { document.getElementById("mainApp").classList.toggle("privacy-active"); privacy = document.getElementById("mainApp").classList.contains("privacy-active"); localStorage.setItem("sfr_privacy", privacy); }
+    function updateButtons() { const hasPass = !!sfrPass; document.getElementById("btn-set-pass").style.display = hasPass ? "none" : "inline-block"; document.getElementById("btn-change-pass").style.display = hasPass ? "inline-block" : "none"; document.getElementById("btn-del-pass").style.display = hasPass ? "inline-block" : "none"; }
+    function setPass() { let p = prompt("Create Password:"); if(p) { localStorage.setItem("sfr_v6_pass", p); sfrPass = p; location.reload(); } }
+    function changePass() { if(prompt("Old Password:") === sfrPass) { let n = prompt("New Password:"); if(n) { localStorage.setItem("sfr_v6_pass", n); sfrPass = n; alert("Changed!"); } } else alert("Wrong!"); }
+    function deletePass() { if(prompt("Enter Password to confirm deletion:") === sfrPass) { localStorage.removeItem("sfr_v6_pass"); sfrPass = null; updateButtons(); alert("Deleted!"); } else alert("Wrong!"); }
+    function verifyLock() { if(document.getElementById("unlockPass").value === sfrPass) { document.getElementById("lock-screen").style.display = "none"; document.getElementById("mainApp").style.display = "block"; render(); } else alert("Denied!"); }
+    function addAcc() { let n = prompt("Account Name:"); if(n) { accounts.push({name:n, initial:0, transactions:[]}); save(); render(); } }
+    function renameAcc() { let n = prompt("Rename:", accounts[currentIdx].name); if(n) { accounts[currentIdx].name = n; save(); render(); } }
+    function delAcc() { if(accounts.length > 1 && confirm("Delete account?")) { accounts.splice(currentIdx, 1); currentIdx = 0; save(); render(); } }
+    function modifyInitial() { let v = prompt("Initial Balance:", accounts[currentIdx].initial); if(v!==null) { accounts[currentIdx].initial = parseFloat(v) || 0; save(); render(); } }
+    function switchAccount() { currentIdx = parseInt(document.getElementById("accSelect").value); render(); }
+    function populateMonths() { const s = document.getElementById("monthFilter"); s.innerHTML = '<option value="all">All Time</option>'; ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].forEach((m, i) => { s.innerHTML += `<option value="${i}">${m}</option>`; }); }
+    function updateUI() { const t = dict[lang]; document.body.className = (lang === "ar" ? "rtl " : "ltr ") + (theme === "dark" ? "dark" : ""); document.getElementById("ui-title").innerText = t.title; document.getElementById("ui-g-inc").innerText = t.gInc; document.getElementById("ui-g-exp").innerText = t.gExp; document.getElementById("ui-g-net").innerText = t.gNet; document.getElementById("ui-init").innerText = t.init; document.getElementById("ui-inc").innerText = t.inc; document.getElementById("ui-exp").innerText = t.exp; document.getElementById("ui-bal").innerText = t.bal; document.getElementById("ui-save").innerText = t.save; document.getElementById("ui-hist").innerText = t.hist; render(); }
+    function render() {
+        const accSel = document.getElementById("accSelect"); accSel.innerHTML = ""; accounts.forEach((a, i) => { const o = document.createElement("option"); o.value = i; o.text = a.name; accSel.appendChild(o); }); accSel.value = currentIdx;
+        let gInc = 0, gExp = 0, gNet = 0; accounts.forEach(acc => { let accNet = acc.initial; acc.transactions.forEach(t => { if(t.type === "income") { gInc += t.amt; accNet += t.amt; } else { gExp += t.amt; accNet -= t.amt; } }); gNet += accNet; });
+        const cur = accounts[currentIdx]; const filter = document.getElementById("monthFilter").value; let cInc = 0, cExp = 0; const list = document.getElementById("transList"); list.innerHTML = "";
+        cur.transactions.forEach((t, i) => {
+            const tDate = new Date(t.date); if(filter === "all" || tDate.getMonth() == filter) { if(t.type === "income") cInc += t.amt; else cExp += t.amt;
+                const dStr = tDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }); const tStr = tDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                list.innerHTML = `<div class="item"><span><b>${t.cat}</b><br><small style="color:#64748b">${t.desc || ''}</small><br><small style="color:#94a3b8; font-size:0.7rem">📅 ${dStr} | 🕒 ${tStr}</small></span><div style="display:flex; align-items:center; gap:8px"><b class="blur-val" style="color:${t.type==='income'?'var(--success)':'var(--danger)'}">${t.amt.toLocaleString()}</b><button onclick="editFull(${i})" style="background:none; border:none; cursor:pointer">✏️</button><button onclick="delT(${i})" style="background:none; border:none; color:red; cursor:pointer">🗑️</button></div></div>` + list.innerHTML;
+            }
+        });
+        document.getElementById("val-g-inc").innerText = gInc.toLocaleString(); document.getElementById("val-g-exp").innerText = gExp.toLocaleString(); document.getElementById("val-g-net").innerText = gNet.toLocaleString();
+        document.getElementById("val-init").innerText = cur.initial.toLocaleString(); document.getElementById("val-inc").innerText = cInc.toLocaleString(); document.getElementById("val-exp").innerText = cExp.toLocaleString(); document.getElementById("val-bal").innerText = (cur.initial + cInc - cExp).toLocaleString();
+    }
+    function addEntry(e) { e.preventDefault(); const amt = parseFloat(document.getElementById("amtInp").value); if(amt) { accounts[currentIdx].transactions.push({ cat: document.getElementById("catSelect").value, desc: document.getElementById("descInp").value || "", amt: amt, type: document.getElementById("typeInp").value, date: new Date().toISOString() }); save(); render(); e.target.reset(); } }
+    function editFull(i) {
+        const t = accounts[currentIdx].transactions[i];
+        const nAmt = prompt("New Amount:", t.amt); if (nAmt !== null) t.amt = parseFloat(nAmt) || 0;
+        let cM = "Category:\n"; categories.forEach((c, idx) => cM += `${idx + 1}. ${c}\n`);
+        const nIdx = prompt(cM, categories.indexOf(t.cat) + 1); if (nIdx && categories[nIdx - 1]) t.cat = categories[nIdx - 1];
+        const nD = prompt("New Description:", t.desc); if (nD !== null) t.desc = nD;
+        save(); render();
+    }
+    function delT(i) { if(confirm("Delete?")) { accounts[currentIdx].transactions.splice(i, 1); save(); render(); } }
+</script>
+</body>
+</html>
