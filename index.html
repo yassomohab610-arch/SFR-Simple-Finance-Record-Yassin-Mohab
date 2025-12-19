@@ -37,12 +37,25 @@
         .item { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 16px; border-radius: 16px; margin-bottom: 10px; border: 1px solid var(--accent); border-left: 6px solid var(--primary); }
         .rtl { direction: rtl; } .ltr { direction: ltr; }
         .footer-custom { margin-top: 60px; padding: 40px 20px; border-top: 1px solid var(--accent); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%; box-sizing: border-box; }
+
+        .privacy-link { cursor: pointer; color: var(--primary); font-size: 0.9rem; text-decoration: underline; margin-top: 15px; display: inline-block; }
+        #privacy-modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--bg); color: var(--text); padding: 20px; z-index: 20000; 
+            overflow-y: auto; box-sizing: border-box; text-align: left;
+        }
+        body.rtl #privacy-modal { text-align: right; }
+        .close-privacy-btn { 
+            position: sticky; top: 0; background: var(--danger); color: white; 
+            border: none; padding: 12px; width: 100%; border-radius: 10px; 
+            font-weight: bold; margin-bottom: 20px; cursor: pointer; z-index: 20001;
+        }
     </style>
 </head>
 <body class="ltr">
 
 <div id="splash-screen">
-    <div class="logo-anim">🏦</div>
+    <div class="logo-anim">💰</div>
     <h1 style="color: white; margin: 15px 0 0 0; letter-spacing: 5px; font-size: 45px;">SFR</h1>
     <p style="color: #94a3b8; font-size: 14px; margin-top: 5px; text-transform: uppercase; letter-spacing: 2px;">Simple Finance Record</p>
     <div class="loading-bar"><div class="loading-progress"></div></div>
@@ -97,8 +110,6 @@
             <div class="card">
                 <form onsubmit="addEntry(event)">
                     <select id="catSelect">
-                        <option value="🏋️ Sport & Gym">🏋️ Sport & Gym</option>
-                        <option value="🎁 Gift">🎁 Gift</option>
                         <option value="🍔 Food & Dining">🍔 Food & Dining</option>
                         <option value="🛒 Groceries">🛒 Groceries</option>
                         <option value="🚗 Transport">🚗 Transport</option>
@@ -136,7 +147,24 @@
         <p style="margin: 5px 0; color: #64748b; font-size: 1.1rem;">Designed & Developed by</p>
         <p style="margin: 5px 0; color: var(--text); font-size: 1.3rem; font-weight: 700;">Yassin Mohab Mohamed</p>
         <p style="margin: 15px 0 5px 0; color: #94a3b8; font-size: 0.85rem; letter-spacing: 1px;">© 2025 SFR - SIMPLE FINANCE RECORD | v6.5</p>
+        <span class="privacy-link" onclick="openPrivacy()">Privacy Policy | سياسة الخصوصية</span>
     </footer>
+</div>
+
+<div id="privacy-modal">
+    <button class="close-privacy-btn" onclick="closePrivacy()">إغلاق / Close</button>
+    <div dir="auto" style="padding-bottom: 40px;">
+        <h3 style="color: var(--primary);">Privacy Policy - سياسة الخصوصية</h3>
+        <p>This app is developed by <strong>Yassin Mohab Mohamed</strong>.</p>
+        <p>1. <strong>Data Storage:</strong> All financial data is stored locally on your device (LocalStorage). We do not collect or store your data on any external servers.</p>
+        <p>2. <strong>Ads:</strong> This app may use Google AdMob to display advertisements.</p>
+        <p>3. <strong>Permissions:</strong> This app <strong>does not</strong> require access to your camera, microphone, contacts, or any private hardware permissions.</p>
+        <hr style="border: 0.5px solid var(--accent); margin: 20px 0;">
+        <p>هذا التطبيق مطور بواسطة المبرمج <strong>ياسين مهاب محمد</strong>.</p>
+        <p>١. <strong>تخزين البيانات:</strong> يتم تخزين كافة البيانات المالية محلياً على جهازك فقط. نحن لا نجمع بياناتك ولا نطلع عليها.</p>
+        <p>٢. <strong>الإعلانات:</strong> قد يستخدم التطبيق خدمات Google AdMob لعرض الإعلانات.</p>
+        <p>٣. <strong>الصلاحيات:</strong> التطبيق <strong>لا يطلب</strong> الوصول إلى الكاميرا، الميكروفون، الأسماء، أو أي صلاحيات خاصة في جهازك.</p>
+    </div>
 </div>
 
 <script>
@@ -147,6 +175,16 @@
     let currentIdx = 0;
     let accounts = JSON.parse(localStorage.getItem("sfr_v6_data")) || [{ name: "Main Account", initial: 0, transactions: [] }];
     let sfrPass = localStorage.getItem("sfr_v6_pass");
+
+    // مصفوفة التصنيفات للرجوع إليها بالأرقام
+    const CATEGORIES_LIST = [
+        "🍔 Food & Dining", "🛒 Groceries", "🚗 Transport", "🛍️ Shopping", 
+        "📱 Bills & Phone", "🏠 Rent & Home", "💊 Health & Med", "🎓 Education", 
+        "🎮 Entertainment", "✈️ Travel", "📈 Investment", "💰 Salary", "➕ Other"
+    ];
+
+    function openPrivacy() { document.getElementById('privacy-modal').style.display = 'block'; }
+    function closePrivacy() { document.getElementById('privacy-modal').style.display = 'none'; }
 
     const dict = { 
         en: { title:"SFR Dashboard", gInc:"Incomes", gExp:"Expenses", gNet:"Net Worth", init:"Initial", inc:"In", exp:"Out", bal:"Balance", hist:"History", save:"Post to SFR" }, 
@@ -184,6 +222,7 @@
     function switchAccount() { currentIdx = parseInt(document.getElementById("accSelect").value); render(); }
     function populateMonths() { const s = document.getElementById("monthFilter"); s.innerHTML = '<option value="all">All Time</option>'; ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].forEach((m, i) => { s.innerHTML += `<option value="${i}">${m}</option>`; }); }
     function updateUI() { const t = dict[lang]; document.body.className = (lang === "ar" ? "rtl " : "ltr ") + (theme === "dark" ? "dark" : ""); document.getElementById("ui-title").innerText = t.title; document.getElementById("ui-g-inc").innerText = t.gInc; document.getElementById("ui-g-exp").innerText = t.gExp; document.getElementById("ui-g-net").innerText = t.gNet; document.getElementById("ui-init").innerText = t.init; document.getElementById("ui-inc").innerText = t.inc; document.getElementById("ui-exp").innerText = t.exp; document.getElementById("ui-bal").innerText = t.bal; document.getElementById("ui-save").innerText = t.save; document.getElementById("ui-hist").innerText = t.hist; render(); }
+    
     function render() {
         const accSel = document.getElementById("accSelect"); accSel.innerHTML = ""; accounts.forEach((a, i) => { const o = document.createElement("option"); o.value = i; o.text = a.name; accSel.appendChild(o); }); accSel.value = currentIdx;
         let gInc = 0, gExp = 0, gNet = 0; accounts.forEach(acc => { let accNet = acc.initial; acc.transactions.forEach(t => { if(t.type === "income") { gInc += t.amt; accNet += t.amt; } else { gExp += t.amt; accNet -= t.amt; } }); gNet += accNet; });
@@ -197,13 +236,40 @@
         document.getElementById("val-g-inc").innerText = gInc.toLocaleString(); document.getElementById("val-g-exp").innerText = gExp.toLocaleString(); document.getElementById("val-g-net").innerText = gNet.toLocaleString();
         document.getElementById("val-init").innerText = cur.initial.toLocaleString(); document.getElementById("val-inc").innerText = cInc.toLocaleString(); document.getElementById("val-exp").innerText = cExp.toLocaleString(); document.getElementById("val-bal").innerText = (cur.initial + cInc - cExp).toLocaleString();
     }
+
     function addEntry(e) { e.preventDefault(); const amt = parseFloat(document.getElementById("amtInp").value); if(amt) { accounts[currentIdx].transactions.push({ cat: document.getElementById("catSelect").value, desc: document.getElementById("descInp").value || "", amt: amt, type: document.getElementById("typeInp").value, date: new Date().toISOString() }); save(); render(); e.target.reset(); } }
+
+    // دالة التعديل المطورة مع اختيار التصنيف بالأرقام
     function editFull(i) {
         const t = accounts[currentIdx].transactions[i];
-        const nAmt = prompt("New Amount:", t.amt); if (nAmt !== null) t.amt = parseFloat(nAmt) || 0;
-        const nD = prompt("New Description:", t.desc); if (nD !== null) t.desc = nD;
+        
+        // 1. تعديل المبلغ
+        const nAmt = prompt("New Amount:", t.amt);
+        if (nAmt !== null) t.amt = parseFloat(nAmt) || 0;
+        
+        // 2. تعديل الوصف
+        const nD = prompt("New Description:", t.desc);
+        if (nD !== null) t.desc = nD;
+
+        // 3. تعديل التصنيف بالأرقام
+        let menu = "Select Category Number:\n";
+        CATEGORIES_LIST.forEach((cat, idx) => {
+            menu += `${idx + 1}. ${cat}\n`;
+        });
+        
+        const catChoice = prompt(menu, "");
+        if (catChoice !== null && catChoice.trim() !== "") {
+            const index = parseInt(catChoice) - 1;
+            if (index >= 0 && index < CATEGORIES_LIST.length) {
+                t.cat = CATEGORIES_LIST[index];
+            } else {
+                alert("Invalid Number! Category not changed.");
+            }
+        }
+
         save(); render();
     }
+
     function delT(i) { if(confirm("Delete?")) { accounts[currentIdx].transactions.splice(i, 1); save(); render(); } }
 </script>
 </body>
