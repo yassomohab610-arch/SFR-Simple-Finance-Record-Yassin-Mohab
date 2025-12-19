@@ -3,8 +3,14 @@
   "name": "Simple Finance Record - Yassin Mohab",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2489/2489756.png",
+      "src": "https://raw.githubusercontent.com/yassomohab610-arch/SFR-Simple-Finance-Record-Yassin-Mohab/main/123.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/yassomohab610-arch/SFR-Simple-Finance-Record-Yassin-Mohab/main/123.png",
+      "sizes": "192x192",
       "type": "image/png"
     }
   ],
