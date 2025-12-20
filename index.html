@@ -3,53 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SFR | Simple Finance Record</title>
-    
+    <title>SFR | Simple Finance Record v7.2</title>
+
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#6366f1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #6366f1; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --danger: #ef4444; --success: #22c55e; --accent: #f1f5f9; }
         body.dark { --bg: #020617; --card: #1e293b; --text: #f1f5f9; --accent: #334155; }
+        
+        body.rtl { direction: rtl; font-family: 'Cairo', sans-serif; }
+        body.ltr { direction: ltr; font-family: 'Inter', sans-serif; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { animation: fadeIn 0.8s ease-out; }
         .privacy-active .blur-val { filter: blur(10px); transition: filter 0.3s ease; }
+        
         #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.8s ease; }
         .logo-anim { font-size: 80px; animation: pulse 2s infinite ease-in-out; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+        
         .loading-bar { width: 180px; height: 4px; background: #334155; border-radius: 10px; margin-top: 25px; overflow: hidden; }
         .loading-progress { width: 0%; height: 100%; background: var(--primary); animation: load 2.5s forwards; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
         @keyframes load { to { width: 100%; } }
+
         #lock-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+        
         html, body { overflow-x: hidden; width: 100%; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); transition: all 0.3s ease; }
+        body { background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s; }
         .app-container { display: none; padding: 15px; max-width: 1200px; margin: auto; }
+
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .menu-wrapper { position: relative; }
+        .menu-dot-btn { background: var(--accent); border: none; font-size: 24px; cursor: pointer; color: var(--text); padding: 5px 15px; border-radius: 10px; transition: 0.2s; }
+        
+        .dropdown-menu { 
+            display: none; position: absolute; top: 45px; right: 0; background: var(--card); 
+            border: 1px solid var(--accent); border-radius: 15px; width: 220px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; overflow: hidden;
+            animation: slideDown 0.3s ease-out;
+        }
+        body.rtl .dropdown-menu { right: auto; left: 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .dropdown-menu button { 
+            width: 100%; padding: 12px 15px; border: none; background: none; 
+            color: var(--text); text-align: inherit; cursor: pointer; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--accent);
+        }
+        .dropdown-menu button:hover { background: var(--accent); }
+
         .global-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 20px; border-radius: 24px; text-align: center; margin-bottom: 25px; }
         .account-dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 25px; }
         .stat-card { background: var(--card); padding: 15px; border-radius: 20px; text-align: center; border: 1px solid var(--accent); }
         .main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; width: 100%; }
         @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } }
+
         .card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--accent); margin-bottom: 20px; }
         input, select { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; background: var(--bg); color: var(--text); box-sizing: border-box; }
-        .btn-primary { background: var(--primary); color: white; width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-tool { background: var(--accent); color: var(--text); margin: 3px; font-size: 0.8rem; padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; }
-        .item { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 16px; border-radius: 16px; margin-bottom: 10px; border: 1px solid var(--accent); border-left: 6px solid var(--primary); }
-        .rtl { direction: rtl; } .ltr { direction: ltr; }
-        .footer-custom { margin-top: 60px; padding: 40px 20px; border-top: 1px solid var(--accent); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%; box-sizing: border-box; }
+        
+        .btn-primary { background: var(--primary); color: white; width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-primary:active { transform: scale(0.98); }
+        
+        .btn-tool { background: var(--accent); color: var(--text); padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+        
+        .item { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 16px; border-radius: 16px; margin-bottom: 10px; border: 1px solid var(--accent); border-left: 6px solid var(--primary); animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        body.rtl .item { border-left: none; border-right: 6px solid var(--primary); }
 
-        .privacy-link { cursor: pointer; color: var(--primary); font-size: 0.9rem; text-decoration: underline; margin-top: 15px; display: inline-block; }
-        #privacy-modal { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--bg); color: var(--text); padding: 20px; z-index: 20000; 
-            overflow-y: auto; box-sizing: border-box; text-align: left;
-        }
-        body.rtl #privacy-modal { text-align: right; }
-        .close-privacy-btn { 
-            position: sticky; top: 0; background: var(--danger); color: white; 
-            border: none; padding: 12px; width: 100%; border-radius: 10px; 
-            font-weight: bold; margin-bottom: 20px; cursor: pointer; z-index: 20001;
-        }
+        .modal-calc { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 5000; justify-content: center; align-items: center; }
+        .calc-box { background: #1e293b; padding: 20px; border-radius: 25px; width: 300px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .calc-screen { background: #0f172a; color: #10b981; font-family: monospace; font-size: 2rem; padding: 15px; text-align: right; border-radius: 10px; margin-bottom: 15px; min-height: 50px; overflow: hidden; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .calc-grid button { padding: 15px; border: none; border-radius: 12px; background: #334155; color: white; font-weight: bold; cursor: pointer; }
+        
+        .footer-custom { margin-top: 60px; padding: 40px 20px; border-top: 1px solid var(--accent); text-align: center; }
+        #privacy-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); color: var(--text); padding: 30px; z-index: 20000; overflow-y: auto; box-sizing: border-box; }
+        .privacy-body { max-width: 800px; margin: auto; text-align: left; line-height: 1.6; }
+        body.rtl .privacy-body { text-align: right; }
     </style>
 </head>
 <body class="ltr">
@@ -57,29 +91,29 @@
 <div id="splash-screen">
     <div class="logo-anim">🏦</div>
     <h1 style="color: white; margin: 15px 0 0 0; letter-spacing: 5px; font-size: 45px;">SFR</h1>
-    <p style="color: #94a3b8; font-size: 14px; margin-top: 5px; text-transform: uppercase; letter-spacing: 2px;">Simple Finance Record</p>
     <div class="loading-bar"><div class="loading-progress"></div></div>
 </div>
 
 <div id="lock-screen">
-    <h2 style="margin-bottom: 20px;">🔐 SFR Locked</h2>
-    <input type="password" id="unlockPass" placeholder="Enter Password" style="width: 260px; text-align: center;">
-    <button class="btn-primary" style="width: 260px;" onclick="verifyLock()">Unlock App</button>
+    <h2 id="ui-locked">🔐 SFR Locked</h2>
+    <input type="password" id="unlockPass" placeholder="..." style="width: 260px; text-align: center;">
+    <button class="btn-primary" style="width: 260px;" onclick="verifyLock()" id="ui-unlock-btn">Unlock</button>
 </div>
 
-<audio id="splash-sound" src="https://www.soundjay.com/buttons/sounds/button-20.mp3"></audio>
-
 <div class="app-container" id="mainApp">
-    <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+    <header>
         <h2 id="ui-title">SFR Dashboard</h2>
-        <div>
-            <button class="btn-tool" onclick="toggleLang()">🌐 AR/EN</button>
-            <button class="btn-tool" onclick="toggleTheme()">🌓</button>
-            <button class="btn-tool" onclick="togglePrivacy()">👁️</button>
-            <button class="btn-tool" id="btn-set-pass" onclick="setPass()">🔑 Set Pass</button>
-            <button class="btn-tool" id="btn-change-pass" onclick="changePass()" style="display:none;">⚙️ Edit</button>
-            <button class="btn-tool" id="btn-del-pass" onclick="deletePass()" style="display:none; color: var(--danger);">🗑️ Delete</button>
-            <button class="btn-tool" onclick="location.reload()">🔒 Lock</button>
+        <div class="menu-wrapper">
+            <button class="menu-dot-btn" onclick="toggleMenu()">⋮</button>
+            <div id="dropdown" class="dropdown-menu">
+                <button onclick="openCalc()">🖩 <span id="ui-menu-calc">Calculator</span></button>
+                <button onclick="toggleLang()">🌐 <span id="ui-menu-lang">Change Language</span></button>
+                <button onclick="toggleTheme()">🌓 <span id="ui-menu-theme">Dark/Light Mode</span></button>
+                <button onclick="togglePrivacy()">👁️ <span id="ui-menu-blur">Toggle Blur</span></button>
+                <button id="m-set-pass" onclick="setPass()">🔑 Set Password</button>
+                <button id="m-del-pass" onclick="deletePass()" style="color:var(--danger)">🗑️ Delete Pass</button>
+                <button onclick="location.reload()">🔒 Lock App</button>
+            </div>
         </div>
     </header>
 
@@ -101,36 +135,20 @@
             <div class="card">
                 <select id="accSelect" onchange="switchAccount()"></select>
                 <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                    <button class="btn-tool" onclick="addAcc()">+ New</button>
+                    <button class="btn-tool" onclick="addAcc()" id="ui-add-acc">+ New</button>
                     <button class="btn-tool" onclick="renameAcc()">✏️</button>
                     <button class="btn-tool" onclick="delAcc()" style="color:var(--danger)">🗑️</button>
-                    <button class="btn-tool" onclick="modifyInitial()" style="background:#f59e0b; color:white">⚙️ Initial Balance</button>
+                    <button class="btn-tool" onclick="modifyInitial()" style="background:#f59e0b; color:white" id="ui-init-btn">Initial Balance</button>
                 </div>
             </div>
             <div class="card">
                 <form onsubmit="addEntry(event)">
-                    <select id="catSelect">
-                        <option value="🏋️ Sport & Gym">🏋️ Sport & Gym</option>
-         <option value="🎁 Gift">🎁 Gift </option>
-                        <option value="🍔 Food & Dining">🍔 Food & Dining</option>
-                        <option value="🛒 Groceries">🛒 Groceries</option>
-                        <option value="🚗 Transport">🚗 Transport</option>
-                        <option value="🛍️ Shopping">🛍️ Shopping</option>
-                        <option value="📱 Bills & Phone">📱 Bills & Phone</option>
-                        <option value="🏠 Rent & Home">🏠 Rent & Home</option>
-                        <option value="💊 Health & Med">💊 Health & Med</option>
-                        <option value="🎓 Education">🎓 Education</option>
-                        <option value="🎮 Entertainment">🎮 Entertainment</option>
-                        <option value="✈️ Travel">✈️ Travel</option>
-                        <option value="📈 Investment">📈 Investment</option>
-                        <option value="💰 Salary">💰 Salary</option>
-                        <option value="➕ Other">➕ Other</option>
-                    </select>
+                    <select id="catSelect"></select>
                     <input id="descInp" placeholder="Description">
                     <input type="number" id="amtInp" placeholder="Amount" step="0.01" required>
                     <select id="typeInp">
-                        <option value="expense">Expense (-)</option>
-                        <option value="income">Income (+)</option>
+                        <option value="expense" id="ui-opt-exp">Expense (-)</option>
+                        <option value="income" id="ui-opt-inc">Income (+)</option>
                     </select>
                     <button class="btn-primary" id="ui-save">Post to SFR</button>
                 </form>
@@ -146,31 +164,50 @@
     </div>
 
     <footer class="footer-custom">
-        <p style="margin: 5px 0; color: #64748b; font-size: 1.1rem;">Designed & Developed by</p>
-        <p style="margin: 5px 0; color: var(--text); font-size: 1.3rem; font-weight: 700;">Yassin Mohab Mohamed</p>
-        <p style="margin: 15px 0 5px 0; color: #94a3b8; font-size: 0.85rem; letter-spacing: 1px;">© 2025 SFR - SIMPLE FINANCE RECORD | v6.6</p>
-        <span class="privacy-link" onclick="openPrivacy()">Privacy Policy | سياسة الخصوصية</span>
+        <p style="color: #64748b;" id="ui-dev-by">Designed & Developed by</p>
+        <p style="font-size: 1.3rem; font-weight: 700;">Yassin Mohab Mohamed</p>
+        <p style="color: #94a3b8; font-size: 0.85rem;">© 2025 SFR - v7.2</p>
+        <span style="color:var(--primary); cursor:pointer; text-decoration:underline" onclick="openPrivacy()">Privacy Policy | سياسة الخصوصية</span>
     </footer>
 </div>
 
+<div id="calcModal" class="modal-calc">
+    <div class="calc-box">
+        <div class="calc-screen" id="calcDisplay">0</div>
+        <div class="calc-grid">
+            <button onclick="calcClear()" style="color:var(--danger)">C</button>
+            <button onclick="calcPop()">⌫</button>
+            <button onclick="calcIn('/')" style="background:var(--primary); color:white">÷</button>
+            <button onclick="calcIn('*')" style="background:var(--primary); color:white">×</button>
+            <button onclick="calcIn('7')">7</button><button onclick="calcIn('8')">8</button><button onclick="calcIn('9')">9</button>
+            <button onclick="calcIn('-')" style="background:var(--primary); color:white">-</button>
+            <button onclick="calcIn('4')">4</button><button onclick="calcIn('5')">5</button><button onclick="calcIn('6')">6</button>
+            <button onclick="calcIn('+')" style="background:var(--primary); color:white">+</button>
+            <button onclick="calcIn('1')">1</button><button onclick="calcIn('2')">2</button><button onclick="calcIn('3')">3</button>
+            <button onclick="calcRes()" style="background:var(--primary); color:white; grid-row: span 2;">=</button>
+            <button onclick="calcIn('0')" style="grid-column: span 2;">0</button>
+            <button onclick="calcIn('.')">.</button>
+            <button onclick="closeCalc()" style="grid-column: span 4; background:var(--danger); color:white; margin-top:10px">Close</button>
+        </div>
+    </div>
+</div>
+
 <div id="privacy-modal">
-    <button class="close-privacy-btn" onclick="closePrivacy()">إغلاق / Close</button>
-    <div dir="auto" style="padding-bottom: 40px;">
-        <h3 style="color: var(--primary);">Privacy Policy - سياسة الخصوصية</h3>
-        <p>This app is developed by <strong>Yassin Mohab Mohamed</strong>.</p>
-        <p>1. <strong>Data Storage:</strong> All financial data is stored locally on your device (LocalStorage). We do not collect or store your data on any external servers.</p>
-        <p>2. <strong>Ads:</strong> This app may use Google AdMob to display advertisements.</p>
-        <p>3. <strong>Permissions:</strong> This app <strong>does not</strong> require access to your camera, microphone, contacts, or any private hardware permissions.</p>
-        <hr style="border: 0.5px solid var(--accent); margin: 20px 0;">
-        <p>هذا التطبيق مطور بواسطة المبرمج <strong>ياسين مهاب محمد</strong>.</p>
-        <p>١. <strong>تخزين البيانات:</strong> يتم تخزين كافة البيانات المالية محلياً على جهازك فقط. نحن لا نجمع بياناتك ولا نطلع عليها.</p>
-        <p>٢. <strong>الإعلانات:</strong> قد يستخدم التطبيق خدمات Google AdMob لعرض الإعلانات.</p>
-        <p>٣. <strong>الصلاحيات:</strong> التطبيق <strong>لا يطلب</strong> الوصول إلى الكاميرا، الميكروفون، الأسماء، أو أي صلاحيات خاصة في جهازك.</p>
+    <div class="privacy-body">
+        <button class="btn-primary" onclick="closePrivacy()" style="margin-bottom: 20px;">Close / إغلاق</button>
+        <h2 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Privacy Policy</h2>
+        <p><strong>1. Data Storage:</strong> All your financial data, transactions, and account names are stored locally on your device's browser memory (LocalStorage). We do not have access to your data.</p>
+        <p><strong>2. No Cloud Sync:</strong> This app does not use any servers or cloud databases. If you clear your browser cache or delete site data, your records will be permanently lost unless you have a backup.</p>
+        <p><strong>3. Security:</strong> The password feature is a local barrier. It is not encrypted on a server. It is designed for basic privacy from people using the same device.</p>
+        
+        <h2 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 30px;">سياسة الخصوصية</h2>
+        <p><strong>1. تخزين البيانات:</strong> يتم تخزين جميع بياناتك المالية ومعاملاتك وأسماء حساباتك محلياً في ذاكرة متصفح جهازك (LocalStorage). نحن لا نملك أي وصول إلى بياناتك.</p>
+        <p><strong>2. لا يوجد مزامنة سحابية:</strong> هذا التطبيق لا يستخدم أي خوادم أو قواعد بيانات سحابية. إذا قمت بمسح ذاكرة التخزين المؤقت للمتصفح، فستفقد سجلاتك نهائياً.</p>
+        <p><strong>3. الأمان:</strong> ميزة كلمة المرور هي حاجز محلي فقط وليست مشفرة على خادم خارجي. هي مصممة للخصوصية الأساسية من الأشخاص الذين يستخدمون نفس الجهاز.</p>
     </div>
 </div>
 
 <script>
-    const APP_VERSION = "6.5";
     let lang = localStorage.getItem("sfr_lang") || "en";
     let theme = localStorage.getItem("sfr_theme") || "light";
     let privacy = localStorage.getItem("sfr_privacy") === "true";
@@ -178,60 +215,88 @@
     let accounts = JSON.parse(localStorage.getItem("sfr_v6_data")) || [{ name: "Main Account", initial: 0, transactions: [] }];
     let sfrPass = localStorage.getItem("sfr_v6_pass");
 
-    // مصفوفة التصنيفات للرجوع إليها بالأرقام
-    const CATEGORIES_LIST = [
-        "🍔 Food & Dining", "🛒 Groceries", "🚗 Transport", "🛍️ Shopping", 
-        "📱 Bills & Phone", "🏠 Rent & Home", "💊 Health & Med", "🎓 Education", 
-        "🎮 Entertainment", "✈️ Travel", "📈 Investment", "💰 Salary", "➕ Other"
-    ];
+    const CATEGORIES = {
+        en: ["🏋️ Sport", "🎁 Gift", "🍔 Food", "🛒 Groceries", "🚗 Transport", "🛍️ Shopping", "📱 Bills", "🏠 Rent", "💊 Health", "🎓 Education", "🎮 Fun", "✈️ Travel", "📈 Invest", "💰 Salary", "➕ Other"],
+        ar: ["🏋️ رياضة", "🎁 هدية", "🍔 طعام", "🛒 بقالة", "🚗 مواصلات", "🛍️ تسوق", "📱 فواتير", "🏠 سكن", "💊 صحة", "🎓 تعليم", "🎮 ترفيه", "✈️ سفر", "📈 استثمار", "💰 راتب", "➕ أخرى"]
+    };
 
-    function openPrivacy() { document.getElementById('privacy-modal').style.display = 'block'; }
-    function closePrivacy() { document.getElementById('privacy-modal').style.display = 'none'; }
-
-    const dict = { 
-        en: { title:"SFR Dashboard", gInc:"Incomes", gExp:"Expenses", gNet:"Net Worth", init:"Initial", inc:"In", exp:"Out", bal:"Balance", hist:"History", save:"Post to SFR" }, 
-        ar: { title:"لوحة تحكم SFR", gInc:"الدخل", gExp:"المصاريف", gNet:"الثروة", init:"البداية", inc:"دخل", exp:"خرج", bal:"الرصيد", hist:"السجل", save:"حفظ في SFR" } 
+    const dict = {
+        en: { 
+            title: "SFR Dashboard", gInc: "Incomes", gExp: "Expenses", gNet: "Net Worth", init: "Initial", inc: "In", exp: "Out", bal: "Balance", hist: "History", save: "Post to SFR",
+            menuCalc: "Calculator", menuLang: "العربية", menuTheme: "Dark/Light Mode", menuBlur: "Toggle Blur", setPass: "Set Password", delPass: "Delete Pass", locked: "🔐 SFR Locked", unlock: "Unlock",
+            addAcc: "+ New", optExp: "Expense (-)", optInc: "Income (+)", devBy: "Designed & Developed by", initBtn: "Initial Balance", errPass: "Wrong Current Password!"
+        },
+        ar: { 
+            title: "لوحة تحكم SFR", gInc: "الدخل", gExp: "المصاريف", gNet: "الثروة", init: "البداية", inc: "داخل", exp: "خارج", bal: "الرصيد", hist: "السجل", save: "حفظ في السجل",
+            menuCalc: "الآلة الحاسبة", menuLang: "English", menuTheme: "الوضع الليلي", menuBlur: "إخفاء الأرقام", setPass: "إنشاء كلمة سر", delPass: "حذف كلمة السر", locked: "🔐 SFR مغلق", unlock: "فتح التطبيق",
+            addAcc: "+ جديد", optExp: "مصروف (-)", optInc: "دخل (+)", devBy: "تم التصميم والتطوير بواسطة", initBtn: "الرصيد الافتتاحي", errPass: "كلمة السر الحالية خاطئة!"
+        }
     };
 
     window.onload = () => {
-        if (theme === "dark") document.body.classList.add("dark");
-        if (privacy) document.getElementById("mainApp").classList.add("privacy-active");
+        applyTheme();
+        updateUI();
         setTimeout(() => {
             document.getElementById("splash-screen").style.opacity = "0";
             setTimeout(() => {
                 document.getElementById("splash-screen").style.display = "none";
                 if(sfrPass) document.getElementById("lock-screen").style.display = "flex";
                 else { document.getElementById("mainApp").style.display = "block"; render(); }
-                document.getElementById("splash-sound").play().catch(()=>{});
-                updateButtons(); populateMonths(); updateUI();
             }, 800);
-        }, 2500);
+        }, 2000);
     };
 
-    function save() { localStorage.setItem("sfr_v6_data", JSON.stringify(accounts)); }
-    function toggleLang() { lang = lang === "en" ? "ar" : "en"; localStorage.setItem("sfr_lang", lang); updateUI(); }
-    function toggleTheme() { document.body.classList.toggle("dark"); theme = document.body.classList.contains("dark") ? "dark" : "light"; localStorage.setItem("sfr_theme", theme); }
-    function togglePrivacy() { document.getElementById("mainApp").classList.toggle("privacy-active"); privacy = document.getElementById("mainApp").classList.contains("privacy-active"); localStorage.setItem("sfr_privacy", privacy); }
-    function updateButtons() { const hasPass = !!sfrPass; document.getElementById("btn-set-pass").style.display = hasPass ? "none" : "inline-block"; document.getElementById("btn-change-pass").style.display = hasPass ? "inline-block" : "none"; document.getElementById("btn-del-pass").style.display = hasPass ? "inline-block" : "none"; }
-    function setPass() { let p = prompt("Create Password:"); if(p) { localStorage.setItem("sfr_v6_pass", p); sfrPass = p; location.reload(); } }
-    function changePass() { if(prompt("Old Password:") === sfrPass) { let n = prompt("New Password:"); if(n) { localStorage.setItem("sfr_v6_pass", n); sfrPass = n; alert("Changed!"); } } else alert("Wrong!"); }
-    function deletePass() { if(prompt("Enter Password to confirm deletion:") === sfrPass) { localStorage.removeItem("sfr_v6_pass"); sfrPass = null; updateButtons(); alert("Deleted!"); } else alert("Wrong!"); }
-    function verifyLock() { if(document.getElementById("unlockPass").value === sfrPass) { document.getElementById("lock-screen").style.display = "none"; document.getElementById("mainApp").style.display = "block"; render(); } else alert("Denied!"); }
-    function addAcc() { let n = prompt("Account Name:"); if(n) { accounts.push({name:n, initial:0, transactions:[]}); save(); render(); } }
-    function renameAcc() { let n = prompt("Rename:", accounts[currentIdx].name); if(n) { accounts[currentIdx].name = n; save(); render(); } }
-    function delAcc() { if(accounts.length > 1 && confirm("Delete account?")) { accounts.splice(currentIdx, 1); currentIdx = 0; save(); render(); } }
-    function modifyInitial() { let v = prompt("Initial Balance:", accounts[currentIdx].initial); if(v!==null) { accounts[currentIdx].initial = parseFloat(v) || 0; save(); render(); } }
-    function switchAccount() { currentIdx = parseInt(document.getElementById("accSelect").value); render(); }
-    function populateMonths() { const s = document.getElementById("monthFilter"); s.innerHTML = '<option value="all">All Time</option>'; ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].forEach((m, i) => { s.innerHTML += `<option value="${i}">${m}</option>`; }); }
-    function updateUI() { const t = dict[lang]; document.body.className = (lang === "ar" ? "rtl " : "ltr ") + (theme === "dark" ? "dark" : ""); document.getElementById("ui-title").innerText = t.title; document.getElementById("ui-g-inc").innerText = t.gInc; document.getElementById("ui-g-exp").innerText = t.gExp; document.getElementById("ui-g-net").innerText = t.gNet; document.getElementById("ui-init").innerText = t.init; document.getElementById("ui-inc").innerText = t.inc; document.getElementById("ui-exp").innerText = t.exp; document.getElementById("ui-bal").innerText = t.bal; document.getElementById("ui-save").innerText = t.save; document.getElementById("ui-hist").innerText = t.hist; render(); }
-    
+    function toggleMenu() { const d = document.getElementById("dropdown"); d.style.display = (d.style.display === "block") ? "none" : "block"; }
+    function toggleLang() { lang = (lang === "en") ? "ar" : "en"; localStorage.setItem("sfr_lang", lang); location.reload(); }
+    function toggleTheme() { theme = (theme === "light") ? "dark" : "light"; localStorage.setItem("sfr_theme", theme); applyTheme(); }
+    function applyTheme() { document.body.classList.toggle("dark", theme === "dark"); }
+    function togglePrivacy() { privacy = !privacy; localStorage.setItem("sfr_privacy", privacy); document.getElementById("mainApp").classList.toggle("privacy-active", privacy); }
+
+    function updateUI() {
+        const d = dict[lang];
+        document.body.className = (lang === "ar" ? "rtl " : "ltr ") + (theme === "dark" ? "dark" : "");
+        document.getElementById("ui-title").innerText = d.title;
+        document.getElementById("ui-g-inc").innerText = d.gInc;
+        document.getElementById("ui-g-exp").innerText = d.gExp;
+        document.getElementById("ui-g-net").innerText = d.gNet;
+        document.getElementById("ui-init").innerText = d.init;
+        document.getElementById("ui-inc").innerText = d.inc;
+        document.getElementById("ui-exp").innerText = d.exp;
+        document.getElementById("ui-bal").innerText = d.bal;
+        document.getElementById("ui-save").innerText = d.save;
+        document.getElementById("ui-hist").innerText = d.hist;
+        document.getElementById("ui-menu-calc").innerText = d.menuCalc;
+        document.getElementById("ui-menu-lang").innerText = d.menuLang;
+        document.getElementById("ui-menu-theme").innerText = d.menuTheme;
+        document.getElementById("ui-menu-blur").innerText = d.menuBlur;
+        document.getElementById("ui-init-btn").innerText = d.initBtn;
+        document.getElementById("m-set-pass").innerText = sfrPass ? (lang === 'ar' ? "تغيير كلمة السر" : "Change Pass") : d.setPass;
+        document.getElementById("m-del-pass").style.display = sfrPass ? "block" : "none";
+        document.getElementById("ui-locked").innerText = d.locked;
+        document.getElementById("ui-unlock-btn").innerText = d.unlock;
+        document.getElementById("ui-add-acc").innerText = d.addAcc;
+        document.getElementById("ui-opt-exp").innerText = d.optExp;
+        document.getElementById("ui-opt-inc").innerText = d.optInc;
+        document.getElementById("ui-dev-by").innerText = d.devBy;
+
+        const catS = document.getElementById("catSelect");
+        catS.innerHTML = "";
+        CATEGORIES[lang].forEach(c => catS.innerHTML += `<option value="${c}">${c}</option>`);
+        
+        const mS = document.getElementById("monthFilter");
+        mS.innerHTML = `<option value="all">${lang === 'ar' ? 'الكل' : 'All Time'}</option>`;
+        const months = lang === 'ar' ? ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"] : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        months.forEach((m, i) => mS.innerHTML += `<option value="${i}">${m}</option>`);
+    }
+
     function render() {
         const accSel = document.getElementById("accSelect"); accSel.innerHTML = ""; accounts.forEach((a, i) => { const o = document.createElement("option"); o.value = i; o.text = a.name; accSel.appendChild(o); }); accSel.value = currentIdx;
         let gInc = 0, gExp = 0, gNet = 0; accounts.forEach(acc => { let accNet = acc.initial; acc.transactions.forEach(t => { if(t.type === "income") { gInc += t.amt; accNet += t.amt; } else { gExp += t.amt; accNet -= t.amt; } }); gNet += accNet; });
         const cur = accounts[currentIdx]; const filter = document.getElementById("monthFilter").value; let cInc = 0, cExp = 0; const list = document.getElementById("transList"); list.innerHTML = "";
         cur.transactions.forEach((t, i) => {
             const tDate = new Date(t.date); if(filter === "all" || tDate.getMonth() == filter) { if(t.type === "income") cInc += t.amt; else cExp += t.amt;
-                const dStr = tDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }); const tStr = tDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const dStr = tDate.toLocaleDateString(lang==='ar'?'ar-EG':'en-GB', { day: '2-digit', month: 'short' });
+                const tStr = tDate.toLocaleTimeString(lang==='ar'?'ar-EG':'en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
                 list.innerHTML = `<div class="item"><span><b>${t.cat}</b><br><small style="color:#64748b">${t.desc || ''}</small><br><small style="color:#94a3b8; font-size:0.7rem">📅 ${dStr} | 🕒 ${tStr}</small></span><div style="display:flex; align-items:center; gap:8px"><b class="blur-val" style="color:${t.type==='income'?'var(--success)':'var(--danger)'}">${t.amt.toLocaleString()}</b><button onclick="editFull(${i})" style="background:none; border:none; cursor:pointer">✏️</button><button onclick="delT(${i})" style="background:none; border:none; color:red; cursor:pointer">🗑️</button></div></div>` + list.innerHTML;
             }
         });
@@ -240,39 +305,58 @@
     }
 
     function addEntry(e) { e.preventDefault(); const amt = parseFloat(document.getElementById("amtInp").value); if(amt) { accounts[currentIdx].transactions.push({ cat: document.getElementById("catSelect").value, desc: document.getElementById("descInp").value || "", amt: amt, type: document.getElementById("typeInp").value, date: new Date().toISOString() }); save(); render(); e.target.reset(); } }
+    function save() { localStorage.setItem("sfr_v6_data", JSON.stringify(accounts)); }
+    function switchAccount() { currentIdx = parseInt(document.getElementById("accSelect").value); render(); }
+    function addAcc() { let n = prompt(lang==='ar'?"اسم الحساب:":"Account Name:"); if(n) { accounts.push({name:n, initial:0, transactions:[]}); save(); render(); } }
+    function renameAcc() { let n = prompt("Rename:", accounts[currentIdx].name); if(n) { accounts[currentIdx].name = n; save(); render(); } }
+    function delAcc() { if(accounts.length > 1 && confirm("Delete?")) { accounts.splice(currentIdx, 1); currentIdx = 0; save(); render(); } }
+    function modifyInitial() { let v = prompt("Initial Balance:", accounts[currentIdx].initial); if(v!==null) { accounts[currentIdx].initial = parseFloat(v) || 0; save(); render(); } }
+    function delT(i) { if(confirm("Delete?")) { accounts[currentIdx].transactions.splice(i, 1); save(); render(); } }
 
-    // دالة التعديل المطورة مع اختيار التصنيف بالأرقام
     function editFull(i) {
         const t = accounts[currentIdx].transactions[i];
-        
-        // 1. تعديل المبلغ
-        const nAmt = prompt("New Amount:", t.amt);
-        if (nAmt !== null) t.amt = parseFloat(nAmt) || 0;
-        
-        // 2. تعديل الوصف
-        const nD = prompt("New Description:", t.desc);
-        if (nD !== null) t.desc = nD;
-
-        // 3. تعديل التصنيف بالأرقام
-        let menu = "Select Category Number:\n";
-        CATEGORIES_LIST.forEach((cat, idx) => {
-            menu += `${idx + 1}. ${cat}\n`;
-        });
-        
+        const nAmt = prompt("Amount:", t.amt); if (nAmt !== null) t.amt = parseFloat(nAmt) || 0;
+        const nD = prompt("Description:", t.desc); if (nD !== null) t.desc = nD;
+        let menu = lang === 'ar' ? "اختر رقم التصنيف:\n" : "Select Category Number:\n";
+        CATEGORIES[lang].forEach((cat, idx) => menu += `${idx + 1}. ${cat}\n`);
         const catChoice = prompt(menu, "");
-        if (catChoice !== null && catChoice.trim() !== "") {
-            const index = parseInt(catChoice) - 1;
-            if (index >= 0 && index < CATEGORIES_LIST.length) {
-                t.cat = CATEGORIES_LIST[index];
-            } else {
-                alert("Invalid Number! Category not changed.");
-            }
-        }
-
+        if (catChoice) { const index = parseInt(catChoice) - 1; if (index >= 0 && index < CATEGORIES[lang].length) t.cat = CATEGORIES[lang][index]; }
         save(); render();
     }
 
-    function delT(i) { if(confirm("Delete?")) { accounts[currentIdx].transactions.splice(i, 1); save(); render(); } }
+    function verifyLock() { if(document.getElementById("unlockPass").value === sfrPass) { document.getElementById("lock-screen").style.display = "none"; document.getElementById("mainApp").style.display = "block"; render(); } else alert("Wrong!"); }
+    
+    function confirmOldPass() {
+        if (!sfrPass) return true;
+        const check = prompt(lang === 'ar' ? "أدخل كلمة السر الحالية:" : "Enter current password:");
+        if (check === sfrPass) return true;
+        alert(dict[lang].errPass);
+        return false;
+    }
+
+    function setPass() { 
+        if(confirmOldPass()) {
+            let p = prompt(lang === 'ar' ? "كلمة السر الجديدة:" : "New Password:"); 
+            if(p) { localStorage.setItem("sfr_v6_pass", p); sfrPass = p; location.reload(); } 
+        }
+    }
+
+    function deletePass() { 
+        if(confirmOldPass()) { 
+            localStorage.removeItem("sfr_v6_pass"); sfrPass = null; location.reload(); 
+        } 
+    }
+
+    let cExp = "0";
+    function openCalc() { document.getElementById("calcModal").style.display = "flex"; toggleMenu(); }
+    function closeCalc() { document.getElementById("calcModal").style.display = "none"; }
+    function calcIn(v) { if(cExp === "0") cExp = v; else cExp += v; document.getElementById("calcDisplay").innerText = cExp; }
+    function calcClear() { cExp = "0"; document.getElementById("calcDisplay").innerText = cExp; }
+    function calcPop() { cExp = cExp.slice(0, -1); if(cExp==="") cExp="0"; document.getElementById("calcDisplay").innerText = cExp; }
+    function calcRes() { try { cExp = eval(cExp).toString(); document.getElementById("calcDisplay").innerText = cExp; } catch { cExp = "Error"; document.getElementById("calcDisplay").innerText = cExp; cExp = "0"; } }
+
+    function openPrivacy() { document.getElementById("privacy-modal").style.display = "block"; }
+    function closePrivacy() { document.getElementById("privacy-modal").style.display = "none"; }
 </script>
 </body>
 </html>
