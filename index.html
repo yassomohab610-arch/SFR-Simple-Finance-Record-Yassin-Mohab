@@ -171,6 +171,8 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes menuSlide { from { opacity: 0; transform: translateY(-10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        /* New Exit Animation */
+        @keyframes menuSlideOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-10px) scale(0.95); } }
         
         .app-container { animation: fadeIn 0.8s ease-out; }
         .privacy-active .blur-val { filter: blur(10px); transition: filter 0.3s ease; }
@@ -207,6 +209,11 @@
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15); z-index: 1000; overflow: hidden;
             animation: menuSlide 0.3s ease-out forwards; padding: 10px;
         }
+        /* Closing State Class */
+        .dropdown-menu.closing {
+            animation: menuSlideOut 0.3s ease-in forwards;
+        }
+
         body.dark .dropdown-menu { background: var(--card); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4); }
         body.rtl .dropdown-menu { right: auto; left: 0; }
 
@@ -297,6 +304,13 @@
         
         .search-container { position: relative; margin-bottom: 20px; }
         .search-input { padding-left: 45px !important; border-radius: 16px !important; border: 1px solid var(--border) !important; }
+        /* Added search input focus style */
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 4px var(--primary-light) !important;
+            background: var(--card) !important;
+        }
         body.rtl .search-input { padding-left: 12px !important; padding-right: 45px !important; }
         .search-icon { position: absolute; top: 15px; left: 15px; color: var(--primary); font-size: 1.1rem; }
         body.rtl .search-icon { left: auto; right: 15px; }
@@ -315,6 +329,13 @@
         .calc-grid .cl { background: var(--danger); }
 
         #privacy-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); color: var(--text); padding: 30px; z-index: 20000; overflow-y: auto; box-sizing: border-box; }
+
+        /* Privacy Policy Enhanced Styles */
+        .privacy-content h2 { color: var(--primary); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; margin-top: 25px; font-size: 1.5rem; }
+        .privacy-content h3 { color: var(--text); margin-top: 20px; font-size: 1.1rem; font-weight: 700; }
+        .privacy-content p { margin-bottom: 12px; font-size: 0.95rem; opacity: 0.9; }
+        .privacy-section { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .lang-divider { height: 4px; background: var(--primary); border-radius: 10px; margin: 40px 0; opacity: 0.3; }
     </style>
 </head>
 <body class="ltr">
@@ -408,7 +429,7 @@
             </div>
             <div class="card">
                 <form onsubmit="addEntry(event)">
-                    <div style="margin-bottom: 5px;"><small style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">TYPE / النوع</small></div>
+                    <div style="margin-bottom: 5px;"><small id="ui-label-type" style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">TYPE / النوع</small></div>
                     <div class="type-selector">
                         <button type="button" class="type-btn active" data-type="expense" onclick="setType('expense')" id="ui-opt-exp">Expense (-)</button>
                         <button type="button" class="type-btn" data-type="income" onclick="setType('income')" id="ui-opt-inc">Income (+)</button>
@@ -418,13 +439,13 @@
                         <option value="income">income</option>
                     </select>
 
-                    <div style="margin-bottom: 5px;"><small style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">CATEGORY / الفئة</small></div>
+                    <div style="margin-bottom: 5px;"><small id="ui-label-cat" style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">CATEGORY / الفئة</small></div>
                     <select id="catSelect"></select>
                     
-                    <div style="margin-bottom: 5px;"><small style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">DETAILS / التفاصيل</small></div>
+                    <div style="margin-bottom: 5px;"><small id="ui-label-det" style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">DETAILS / التفاصيل</small></div>
                     <input id="descInp" placeholder="What is this for?">
                     
-                    <div style="margin-bottom: 5px;"><small style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">AMOUNT / المبلغ</small></div>
+                    <div style="margin-bottom: 5px;"><small id="ui-label-amt" style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">AMOUNT / المبلغ</small></div>
                     <input type="number" id="amtInp" placeholder="0.00" step="0.01" required>
                     
                     <button class="btn-primary" id="ui-save">Post to SFR</button>
@@ -489,23 +510,46 @@
 </div>
 
 <div id="privacy-modal">
-    <div style="max-width:800px; margin:auto; padding:20px;">
-        <button class="btn-primary" onclick="closePrivacy()" style="margin-bottom: 20px;">Close / إغلاق</button>
-        <div style="text-align: left; line-height: 1.6;">
-            <h2>Privacy Policy</h2>
-            <p><strong>SFR app was developed by Yassin Mohab Mohamed</strong></p>
-            <p><strong>1. Data Storage:</strong> All your financial data, transactions, and account names are stored locally on your device's browser memory (LocalStorage). We do not have access to your data.</p>
-            <p><strong>2. No Cloud Sync:</strong> This app does not use any servers or cloud databases.</p>
-            <p><strong>3. Ads & Third-Party Disclosure:</strong> We use Google AdMob to display advertisements.</p>
-            <p><strong>4. Access Permissions:</strong> This app does not request any system permissions.</p>
-            <p><strong>5. Security:</strong> The password feature is a local barrier.</p>
+    <div class="privacy-content" style="max-width:800px; margin:auto; padding:20px;">
+        <button class="btn-primary" onclick="closePrivacy()" style="margin-bottom: 25px;">Close / إغلاق</button>
+        
+        <div class="privacy-section">
+            <h2>Privacy Policy & Data Transparency</h2>
+            <p><strong>SFR (Simple Finance Record)</strong> was developed by <strong>Yassin Mohab Mohamed</strong> with a "Privacy-First" philosophy.</p>
             
-            <h2 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 30px;">سياسة الخصوصية</h2>
-            <p><strong>1. تخزين البيانات:</strong> يتم تخزين بياناتك محلياً في المتصفح.</p>
-            <p><strong>2. لا يوجد مزامنة سحابية:</strong> التطبيق لا يستخدم خوادم خارجية.</p>
-            <p><strong>3. الإعلانات:</strong> نستخدم Google AdMob لدعم التطبيق.</p>
-            <p><strong>4. الصلاحيات:</strong> لا نطلب أي وصول للكاميرا أو الصور.</p>
+            <h3>1. Local Data Sovereignty</h3>
+            <p>Your financial data is yours alone. All records, transaction history, account names, and profile information are stored strictly within your device's <strong>LocalStorage</strong> (browser memory). We do not own, manage, or have any technical means to access your data.</p>
+            
+            <h3>2. Zero Cloud Connectivity</h3>
+            <p>To ensure maximum security, this application operates without any external servers or cloud databases. There is no background synchronization; your data never leaves your physical device.</p>
+            
+            <h3>3. Advertising & Analytics</h3>
+            <p>We utilize <strong>Google AdMob</strong> to provide non-intrusive advertisements. These third-party services may collect anonymous device identifiers to serve relevant ads, governed by Google’s own privacy policies.</p>
+            
+            <h3>4. Permissions & Security</h3>
+            <p>The app does not require access to your camera, contacts, or location. The "App Lock" feature is a local security layer intended to prevent unauthorized physical access to the app on your device.</p>
         </div>
+
+        <div class="lang-divider"></div>
+
+        <div class="privacy-section" dir="rtl">
+            <h2>سياسة الخصوصية وشفافية البيانات</h2>
+            <p>تم تطوير تطبيق <strong>SFR</strong> بواسطة المبرمج <strong>ياسين مهاب محمد</strong> مع الالتزام التام بحماية خصوصية المستخدم.</p>
+            
+            <h3>١. سيادة البيانات المحلية</h3>
+            <p>بياناتك المالية ملك لك وحدك. يتم تخزين جميع السجلات، تاريخ المعاملات، وأسماء الحسابات حصرياً في ذاكرة المتصفح المحلية (LocalStorage) الخاصة بجهازك. لا نملك أي وسيلة تقنية للوصول إلى هذه البيانات أو الاطلاع عليها.</p>
+            
+            <h3>٢. انعدام الاتصال السحابي</h3>
+            <p>لضمان أقصى درجات الأمان، يعمل التطبيق بدون أي خوادم خارجية أو قواعد بيانات سحابية. لا توجد مزامنة خلفية؛ بياناتك لا تغادر جهازك الفعلي أبداً.</p>
+            
+            <h3>٣. الإعلانات والتحليلات</h3>
+            <p>نستخدم خدمة <strong>Google AdMob</strong> لعرض الإعلانات. قد تقوم هذه الخدمات بجمع معرفات أجهزة مجهولة لتقديم إعلانات ذات صلة، وذلك وفقاً لسياسات خصوصية شركة Google.</p>
+            
+            <h3>٤. التصاريح والأمان</h3>
+            <p>لا يتطلب التطبيق الوصول إلى الكاميرا أو الأسماء أو الموقع الجغرافي. خاصية "قفل التطبيق" هي طبقة حماية محلية تهدف لمنع الوصول الفعلي غير المصرح به للتطبيق على جهازك.</p>
+        </div>
+        
+        <p style="text-align:center; opacity:0.6; font-size:0.8rem; margin-top:20px;">Last Updated: December 2025</p>
     </div>
 </div>
 
@@ -533,7 +577,8 @@
             confirmDel: "Are you sure?", enterAccName: "Account Name:", enterNewPass: "New Password:", enterCurrPass: "Current Password:",
             amt: "Edit Amount:", desc: "Edit Description:", selectCat: "📁 Change Category:", loginErr: "⚠️ Wrong Password!",
             searchPlace: "Search by name or description...",
-            menuProf: "Profile Settings", profTitle: "Profile", labelName: "Your Name", profSave: "Save Profile", welcome: "Welcome", loginPrompt: "Login to set your name and photo!"
+            menuProf: "Profile Settings", profTitle: "Profile", labelName: "Your Name", profSave: "Save Profile", welcome: "Welcome", loginPrompt: "Login to set your name and photo!",
+            lType: "TYPE", lCat: "CATEGORY", lDet: "DETAILS", lAmt: "AMOUNT", dPlace: "What is this for?"
         },
         ar: { 
             title: "لوحة تحكم SFR", gInc: "الدخل", gExp: "المصاريف", gNet: "الثروة", init: "البداية", inc: "داخل", exp: "خارج", bal: "الرصيد", hist: "السجل", save: "حفظ في السجل",
@@ -542,7 +587,8 @@
             confirmDel: "هل أنت متأكد؟", enterAccName: "اسم الحساب:", enterNewPass: "كلمة السر الجديدة:", enterCurrPass: "كلمة السر الحالية:",
             amt: "تعديل المبلغ:", desc: "تعديل الوصف:", selectCat: "📁 تغيير التصنيف:", loginErr: "⚠️ كلمة السر خاطئة!",
             searchPlace: "ابحث بالاسم أو الوصف...",
-            menuProf: "إعدادات البروفايل", profTitle: "البروفايل", labelName: "اسم المستخدم", profSave: "حفظ البيانات", welcome: "أهلاً بك", loginPrompt: "سجل الآن لوضع اسمك وصورتك!"
+            menuProf: "إعدادات البروفايل", profTitle: "البروفايل", labelName: "اسم المستخدم", profSave: "حفظ البيانات", welcome: "أهلاً بك", loginPrompt: "سجل الآن لوضع اسمك وصورتك!",
+            lType: "النوع", lCat: "الفئة", lDet: "التفاصيل", lAmt: "المبلغ", dPlace: "فيما استخدمت هذا المبلغ؟"
         }
     };
 
@@ -570,10 +616,10 @@
         const btn = document.getElementById("menuBtn");
         
         if (d.style.display === "block") {
-            d.style.display = "none";
-            btn.classList.remove("active");
+            closeMenuEverywhere(); // Use the animated close function
         } else {
             d.style.display = "block";
+            d.classList.remove("closing");
             btn.classList.add("active");
         }
     }
@@ -581,9 +627,15 @@
     function closeMenuEverywhere() {
         const d = document.getElementById("dropdown");
         const btn = document.getElementById("menuBtn");
-        if (d && d.style.display === "block") {
-            d.style.display = "none";
-            btn.classList.remove("active");
+        if (d && d.style.display === "block" && !d.classList.contains("closing")) {
+            d.classList.add("closing");
+            if(btn) btn.classList.remove("active");
+            
+            // Wait for animation to finish before hiding display
+            setTimeout(() => {
+                d.style.display = "none";
+                d.classList.remove("closing");
+            }, 300); // matches CSS animation duration
         }
     }
 
@@ -638,6 +690,13 @@
         document.getElementById("ui-label-name").innerText = d.labelName;
         document.getElementById("ui-prof-save").innerText = d.profSave;
         document.getElementById("ui-login-text").innerText = d.loginPrompt;
+
+        // Added dynamic labels for input form
+        document.getElementById("ui-label-type").innerText = d.lType;
+        document.getElementById("ui-label-cat").innerText = d.lCat;
+        document.getElementById("ui-label-det").innerText = d.lDet;
+        document.getElementById("ui-label-amt").innerText = d.lAmt;
+        document.getElementById("descInp").placeholder = d.dPlace;
 
         const catS = document.getElementById("catSelect");
         catS.innerHTML = "";
@@ -726,8 +785,15 @@
         cur.transactions.forEach((t, i) => {
             const tDate = new Date(t.date);
             const matchesMonth = filter === "all" || tDate.getMonth() == filter;
+            
+            // Logic for date search
+            const dateStr = tDate.toLocaleDateString(lang==='ar'?'ar-EG':'en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toLowerCase();
+            const fullIsoDate = tDate.toISOString().split('T')[0];
+
             const matchesSearch = t.cat.toLowerCase().includes(searchQuery) || 
                                   t.desc.toLowerCase().includes(searchQuery) ||
+                                  dateStr.includes(searchQuery) ||
+                                  fullIsoDate.includes(searchQuery) ||
                                   (t.catIdx !== undefined && CATEGORIES[lang][t.catIdx].toLowerCase().includes(searchQuery));
 
             if(matchesMonth) { 
