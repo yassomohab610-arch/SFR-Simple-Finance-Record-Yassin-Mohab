@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SFR | Simple Finance Record v7.2</title>
+    <title>SFR | Simple Finance Record v8.1</title>
 
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#6366f1">
@@ -14,13 +14,164 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #6366f1; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --danger: #ef4444; --success: #22c55e; --accent: #f1f5f9; }
-        body.dark { --bg: #020617; --card: #1e293b; --text: #f1f5f9; --accent: #334155; }
+        :root { 
+            --primary: #6366f1; 
+            --primary-hover: #4f46e5;
+            --primary-light: rgba(99, 102, 241, 0.1);
+            --bg: #f8fafc; 
+            --card: #ffffff; 
+            --text: #0f172a; 
+            --danger: #ef4444; 
+            --success: #22c55e; 
+            --accent: #f1f5f9; 
+            --border: #e2e8f0;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        body.dark { 
+            --bg: #020617; 
+            --card: #1e293b; 
+            --text: #f1f5f9; 
+            --accent: #334155; 
+            --border: #334155;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
 
         body.rtl { direction: rtl; font-family: 'Cairo', sans-serif; }
         body.ltr { direction: ltr; font-family: 'Inter', sans-serif; }
 
+        header h2#ui-title {
+            background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            margin-bottom: 0;
+        }
+
+        /* Profile Styles */
+        .welcome-container { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        .mini-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; display: none; }
+        .welcome-msg { font-size: 0.95rem; color: #64748b; font-weight: 600; }
+        
+        #profile-page {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 15000; overflow-y: auto; padding: 20px; box-sizing: border-box;
+            animation: fadeIn 0.4s ease;
+        }
+        .profile-card {
+            background: var(--card); border-radius: 30px; padding: 30px; border: 1px solid var(--accent);
+            max-width: 450px; margin: 40px auto; text-align: center; box-shadow: var(--shadow);
+        }
+        .profile-pic-container {
+            width: 130px; height: 130px; border-radius: 50%; background: var(--accent);
+            margin: 0 auto 25px; overflow: hidden; border: 4px solid var(--primary);
+            position: relative; cursor: pointer; transition: transform 0.3s ease;
+        }
+        .profile-pic-container:hover { transform: scale(1.05); }
+        .profile-pic-container img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-pic-container::after {
+            content: "📸"; position: absolute; bottom: 8px; right: 8px; background: var(--primary);
+            width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white;
+        }
+        .profile-input-group { text-align: left; margin-bottom: 20px; }
+        body.rtl .profile-input-group { text-align: right; }
+        .profile-input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; color: var(--primary); }
+
+        /* Login Notification */
+        #login-notif {
+            position: fixed; bottom: 20px; right: 20px; left: 20px; background: var(--primary);
+            color: white; padding: 15px 20px; border-radius: 18px; display: none;
+            justify-content: space-between; align-items: center; z-index: 9000;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4); animation: fadeIn 0.5s ease;
+        }
+
+        .global-stats { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            background: linear-gradient(135deg, #1e40af 0%, #1e293b 100%) !important; 
+            color: white; 
+            padding: 25px; 
+            border-radius: 28px; 
+            text-align: center; 
+            margin-bottom: 25px; 
+            box-shadow: 0 15px 30px -5px rgba(30, 64, 175, 0.3); 
+        }
+
+        .footer-custom { margin-top: 60px; padding: 40px 20px; border-top: 1px solid var(--accent); text-align: center; }
+        
+        .dev-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        #ui-dev-by { color: #64748b; margin: 0; font-weight: 600; }
+
+        #dev-name {
+            background: linear-gradient(135deg, #60a5fa 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            margin: 0;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.1);
+        }
+
+        .swal2-input[style*="display: none"], 
+        .swal2-select[style*="display: none"], 
+        .swal2-textarea[style*="display: none"] {
+            display: none !important;
+        }
+
+        .swal2-popup {
+            background: var(--card) !important;
+            color: var(--text) !important;
+            border-radius: 28px !important;
+            border: 1px solid var(--accent) !important;
+            box-shadow: var(--shadow) !important;
+            width: 90% !important; 
+            max-width: 400px !important;
+            padding: 1.5rem !important;
+        }
+        .swal2-title { 
+            color: var(--text) !important; 
+            font-size: 1.3rem !important;
+            padding: 10px 0 !important;
+        }
+        .swal2-input, .swal2-select {
+            background: var(--bg) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--accent) !important;
+            border-radius: 14px !important;
+            height: 50px !important;
+            box-sizing: border-box !important; 
+            width: 100% !important; 
+            margin: 15px 0 !important;
+            font-size: 1rem !important;
+            display: flex !important;
+        }
+        .swal2-actions {
+            width: 100% !important;
+            margin-top: 10px !important;
+        }
+        .swal2-confirm {
+            background-color: var(--primary) !important;
+            border-radius: 14px !important;
+            padding: 12px 24px !important;
+            font-weight: 600 !important;
+            flex: 1 !important;
+        }
+        .swal2-cancel {
+            border-radius: 14px !important;
+            padding: 12px 24px !important;
+            flex: 1 !important;
+        }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes menuSlide { from { opacity: 0; transform: translateY(-10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        
         .app-container { animation: fadeIn 0.8s ease-out; }
         .privacy-active .blur-val { filter: blur(10px); transition: filter 0.3s ease; }
 
@@ -32,90 +183,143 @@
         .loading-progress { width: 0%; height: 100%; background: var(--primary); animation: load 2.5s forwards; }
         @keyframes load { to { width: 100%; } }
 
-        #lock-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+        #lock-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.4s ease; }
         #lock-error { color: var(--danger); font-size: 0.9rem; margin-top: 10px; font-weight: bold; display: none; }
 
         html, body { overflow-x: hidden; width: 100%; margin: 0; padding: 0; }
         body { background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s; }
         .app-container { display: none; padding: 15px; max-width: 1200px; margin: auto; }
 
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .menu-wrapper { position: relative; }
-        .menu-dot-btn { background: var(--accent); border: none; font-size: 24px; cursor: pointer; color: var(--text); padding: 5px 15px; border-radius: 10px; transition: 0.2s; }
-
-        .dropdown-menu { 
-            display: none; position: absolute; top: 45px; right: 0; background: var(--card); 
-            border: 1px solid var(--accent); border-radius: 15px; width: 220px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; overflow: hidden;
-            animation: slideDown 0.3s ease-out;
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        
+        .menu-dot-btn { 
+            background: var(--card); border: 1px solid var(--accent); font-size: 20px; cursor: pointer; color: var(--text); 
+            width: 45px; height: 45px; border-radius: 12px; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center;
         }
+        .menu-dot-btn.active { background: var(--primary); color: white; transform: rotate(90deg); }
+
+        /* Modern Dropdown Styles */
+        .dropdown-menu { 
+            display: none; position: absolute; top: 55px; right: 0; 
+            background: var(--card);
+            border: 1px solid var(--border); border-radius: 20px; width: 250px; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15); z-index: 1000; overflow: hidden;
+            animation: menuSlide 0.3s ease-out forwards; padding: 10px;
+        }
+        body.dark .dropdown-menu { background: var(--card); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4); }
         body.rtl .dropdown-menu { right: auto; left: 0; }
 
         .dropdown-menu button { 
-            width: 100%; padding: 12px 15px; border: none; background: none; 
-            color: var(--text); text-align: inherit; cursor: pointer; font-size: 0.9rem;
-            display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--accent);
+            width: 100%; padding: 14px 16px; border: none; background: none; color: var(--text); text-align: inherit; 
+            cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; gap: 14px; border-radius: 12px; transition: all 0.2s ease;
+            font-weight: 500;
         }
-        .dropdown-menu button:hover { background: var(--accent); }
+        .dropdown-menu button:hover { background: var(--primary-light); color: var(--primary); transform: translateX(5px); }
+        body.rtl .dropdown-menu button:hover { transform: translateX(-5px); }
 
-        .global-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 20px; border-radius: 24px; text-align: center; margin-bottom: 25px; }
-        .account-dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 25px; }
-        .stat-card { background: var(--card); padding: 15px; border-radius: 20px; text-align: center; border: 1px solid var(--accent); }
+        .account-dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 25px; }
+        
+        .stat-card { background: var(--card); padding: 18px; border-radius: 22px; text-align: center; border: 1px solid var(--accent); box-shadow: var(--shadow); transition: transform 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); }
+
         .main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; width: 100%; }
         @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } }
 
-        .card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--accent); margin-bottom: 20px; }
+        .card { background: var(--card); padding: 22px; border-radius: 26px; border: 1px solid var(--accent); margin-bottom: 20px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
         
         input, select { 
-            width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; 
-            border: 1px solid #ddd; background: var(--bg); color: var(--text); 
-            box-sizing: border-box; display: block;
+            width: 100%; padding: 14px 18px; margin-bottom: 16px; border-radius: 16px; 
+            border: 2px solid var(--border); background: var(--bg); color: var(--text); 
+            box-sizing: border-box; display: block; font-size: 0.95rem; transition: all 0.3s ease;
+            appearance: none;
+        }
+        input:focus, select:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 4px var(--primary-light);
+            background: var(--card);
+        }
+        input::placeholder { color: #94a3b8; opacity: 0.7; }
+
+        .type-selector {
+            display: flex;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 4px;
+            margin-bottom: 16px;
+            gap: 4px;
+        }
+        .type-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        .type-btn.active[data-type="expense"] {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        .type-btn.active[data-type="income"] {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
         }
 
-        .btn-primary { background: var(--primary); color: white; width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-tool { background: var(--accent); color: var(--text); padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%); 
+            color: white; width: 100%; padding: 18px; border-radius: 18px; border: none; 
+            font-weight: 700; cursor: pointer; transition: 0.3s; 
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 20px -3px rgba(99, 102, 241, 0.4); opacity: 0.95; }
+        .btn-primary:active { transform: translateY(0); }
 
-        .item { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 16px; border-radius: 16px; margin-bottom: 10px; border: 1px solid var(--accent); border-left: 6px solid var(--primary); animation: slideIn 0.3s ease-out; }
+        .btn-row { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
+        .btn-tool { background: var(--accent); color: var(--text); padding: 10px 14px; border-radius: 10px; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
+        .btn-tool:hover { background: var(--primary); color: white; }
+
+        .item { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 18px; border-radius: 20px; margin-bottom: 12px; border: 1px solid var(--accent); border-left: 6px solid var(--primary); transition: 0.3s; }
+        .item:hover { transform: scale(1.01); box-shadow: var(--shadow); }
         body.rtl .item { border-left: none; border-right: 6px solid var(--primary); }
 
         .hist-cat { font-weight: 600; font-size: 1rem; }
-        body.rtl .hist-cat { font-weight: 700; }
-
-        /* البحث في الهيستوري */
-        .search-container { position: relative; margin-bottom: 15px; }
-        .search-input { padding-left: 40px !important; }
-        body.rtl .search-input { padding-left: 12px !important; padding-right: 40px !important; }
-        .search-icon { position: absolute; top: 12px; left: 12px; color: #94a3b8; }
-        body.rtl .search-icon { left: auto; right: 12px; }
-
-        .swal2-popup { background: var(--card) !important; color: var(--text) !important; border-radius: 25px !important; padding: 20px !important; }
-        .swal2-title { color: var(--text) !important; font-size: 1.2rem !important; margin-bottom: 10px !important; }
         
-        .swal2-input, .swal2-select { 
-            height: 45px !important;
-            width: 85% !important; 
-            margin: 10px auto !important;
-            border-radius: 12px !important;
-            background: var(--bg) !important;
-            color: var(--text) !important;
-            text-align: center !important;
-            font-size: 1rem !important;
-            border: 1px solid var(--accent) !important;
+        .search-container { position: relative; margin-bottom: 20px; }
+        .search-input { padding-left: 45px !important; border-radius: 16px !important; border: 1px solid var(--border) !important; }
+        body.rtl .search-input { padding-left: 12px !important; padding-right: 45px !important; }
+        .search-icon { position: absolute; top: 15px; left: 15px; color: var(--primary); font-size: 1.1rem; }
+        body.rtl .search-icon { left: auto; right: 15px; }
+
+        .modal-calc { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 5000; justify-content: center; align-items: center; }
+        .calc-box { background: #1e293b; padding: 25px; border-radius: 32px; width: 320px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
+        .calc-screen { background: #0f172a; color: #10b981; font-family: 'Courier New', monospace; font-size: 2.2rem; padding: 20px; text-align: right; border-radius: 15px; margin-bottom: 20px; min-height: 70px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); overflow-x: auto; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .calc-grid button { 
+            padding: 20px 10px; font-size: 1.2rem; font-weight: bold; border-radius: 15px; border: none; cursor: pointer; 
+            transition: 0.2s; background: #334155; color: white;
         }
-        
-        .swal2-select { text-align-last: center !important; padding: 0 10px !important; }
+        .calc-grid button:hover { background: #475569; transform: scale(0.95); }
+        .calc-grid .op { background: var(--primary); }
+        .calc-grid .eq { background: var(--success); grid-row: span 2; }
+        .calc-grid .cl { background: var(--danger); }
 
-        .modal-calc { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 5000; justify-content: center; align-items: center; }
-        .calc-box { background: #1e293b; padding: 20px; border-radius: 25px; width: 300px; }
-        .calc-screen { background: #0f172a; color: #10b981; font-family: monospace; font-size: 2rem; padding: 15px; text-align: right; border-radius: 10px; margin-bottom: 15px; min-height: 50px; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .calc-grid button { padding: 15px; border: none; border-radius: 12px; background: #334155; color: white; font-weight: bold; }
-
-        .footer-custom { margin-top: 60px; padding: 40px 20px; border-top: 1px solid var(--accent); text-align: center; }
         #privacy-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); color: var(--text); padding: 30px; z-index: 20000; overflow-y: auto; box-sizing: border-box; }
     </style>
 </head>
 <body class="ltr">
+
+<audio id="unlockSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
 
 <div id="splash-screen">
     <div class="logo-anim">🏦</div>
@@ -126,17 +330,47 @@
 
 <div id="lock-screen">
     <h2 id="ui-locked">🔐 SFR Locked</h2>
-    <input type="password" id="unlockPass" placeholder="..." style="width: 260px; text-align: center;" oninput="hideLockError()">
+    <input type="password" id="unlockPass" placeholder="..." style="width: 260px; text-align: center; transition: all 0.3s ease;" oninput="hideLockError()">
     <button class="btn-primary" style="width: 260px;" onclick="verifyLock()" id="ui-unlock-btn">Unlock</button>
     <div id="lock-error">⚠️ Wrong Password!</div>
 </div>
 
+<div id="login-notif">
+    <span id="ui-login-text">Login now to set your name and photo!</span>
+    <button onclick="openProfile()" style="background: white; color: var(--primary); border:none; padding: 6px 14px; border-radius: 10px; font-weight: 800; cursor:pointer; font-size: 0.8rem;">LOG IN</button>
+</div>
+
+<div id="profile-page">
+    <div class="profile-card">
+        <h2 style="margin-top: 0;" id="ui-profile-title">User Profile</h2>
+        <div class="profile-pic-container" onclick="triggerPicUpload()">
+            <img id="profile-pic-preview" src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Profile">
+            <input type="file" id="pic-upload" hidden accept="image/*" onchange="previewImage(this)">
+        </div>
+        
+        <div class="profile-input-group">
+            <label id="ui-label-name">Full Name</label>
+            <input type="text" id="prof-name" placeholder="Enter your name...">
+        </div>
+        
+        <button class="btn-primary" onclick="saveProfile()" id="ui-prof-save">Save & Apply</button>
+        <button class="btn-tool" onclick="closeProfile()" style="width:100%; margin-top:12px; padding: 15px;" id="ui-prof-close">Back</button>
+    </div>
+</div>
+
 <div class="app-container" id="mainApp">
     <header>
-        <h2 id="ui-title">SFR Dashboard</h2>
-        <div class="menu-wrapper">
-            <button class="menu-dot-btn" onclick="toggleMenu(event)">⋮</button>
+        <div>
+            <h2 id="ui-title">SFR Dashboard</h2>
+            <div class="welcome-container">
+                <img id="mini-profile-pic" class="mini-avatar" alt="User">
+                <div id="welcome-area" class="welcome-msg"></div>
+            </div>
+        </div>
+        <div class="menu-wrapper" style="position: relative;">
+            <button class="menu-dot-btn" id="menuBtn" onclick="toggleMenu(event)">⋮</button>
             <div id="dropdown" class="dropdown-menu">
+                <button onclick="openProfile()">👤 <span id="ui-menu-profile">Profile Settings</span></button>
                 <button onclick="openCalc()">📟 <span id="ui-menu-calc">Calculator</span></button>
                 <button onclick="toggleLang()">🌐 <span id="ui-menu-lang">Change Language</span></button>
                 <button onclick="toggleTheme()">🌓 <span id="ui-menu-theme">Dark/Light Mode</span></button>
@@ -149,8 +383,8 @@
     </header>
 
     <div class="global-stats">
-        <div><small id="ui-g-inc">Incomes</small><h3 id="val-g-inc" class="blur-val" style="color:var(--success)">0</h3></div>
-        <div><small id="ui-g-exp">Expenses</small><h3 id="val-g-exp" class="blur-val" style="color:var(--danger)">0</h3></div>
+        <div><small id="ui-g-inc">Incomes</small><h3 id="val-g-inc" class="blur-val" style="color:#4ade80">0</h3></div>
+        <div><small id="ui-g-exp">Expenses</small><h3 id="val-g-exp" class="blur-val" style="color:#f87171">0</h3></div>
         <div><small id="ui-g-net">Net Worth</small><h3 id="val-g-net" class="blur-val">0</h3></div>
     </div>
 
@@ -165,7 +399,7 @@
         <div class="side">
             <div class="card">
                 <select id="accSelect" onchange="switchAccount()"></select>
-                <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                <div class="btn-row">
                     <button class="btn-tool" onclick="addAcc()" id="ui-add-acc">+ New</button>
                     <button class="btn-tool" onclick="renameAcc()">✏️</button>
                     <button class="btn-tool" onclick="delAcc()" style="color:var(--danger)">🗑️</button>
@@ -174,13 +408,25 @@
             </div>
             <div class="card">
                 <form onsubmit="addEntry(event)">
-                    <select id="catSelect"></select>
-                    <input id="descInp" placeholder="Description">
-                    <input type="number" id="amtInp" placeholder="Amount" step="0.01" required>
-                    <select id="typeInp">
-                        <option value="expense" id="ui-opt-exp">Expense (-)</option>
-                        <option value="income" id="ui-opt-inc">Income (+)</option>
+                    <div style="margin-bottom: 5px;"><small style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">TYPE / النوع</small></div>
+                    <div class="type-selector">
+                        <button type="button" class="type-btn active" data-type="expense" onclick="setType('expense')" id="ui-opt-exp">Expense (-)</button>
+                        <button type="button" class="type-btn" data-type="income" onclick="setType('income')" id="ui-opt-inc">Income (+)</button>
+                    </div>
+                    <select id="typeInp" style="display:none">
+                        <option value="expense">expense</option>
+                        <option value="income">income</option>
                     </select>
+
+                    <div style="margin-bottom: 5px;"><small style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">CATEGORY / الفئة</small></div>
+                    <select id="catSelect"></select>
+                    
+                    <div style="margin-bottom: 5px;"><small style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">DETAILS / التفاصيل</small></div>
+                    <input id="descInp" placeholder="What is this for?">
+                    
+                    <div style="margin-bottom: 5px;"><small style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">AMOUNT / المبلغ</small></div>
+                    <input type="number" id="amtInp" placeholder="0.00" step="0.01" required>
+                    
                     <button class="btn-primary" id="ui-save">Post to SFR</button>
                 </form>
             </div>
@@ -188,7 +434,7 @@
         <div class="content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
                 <h3 id="ui-hist">History</h3>
-                <select id="monthFilter" style="width:auto; margin:0" onchange="render()"></select>
+                <select id="monthFilter" style="width:auto; margin:0"></select>
             </div>
             
             <div class="search-container">
@@ -201,9 +447,11 @@
     </div>
 
     <footer class="footer-custom">
-        <p style="color: #64748b;" id="ui-dev-by">Designed & Developed by</p>
-        <p style="font-size: 1.3rem; font-weight: 700;">Yassin Mohab Mohamed</p>
-        <p style="color: #94a3b8; font-size: 0.85rem;">© 2025 SFR - v7.2</p>
+        <div class="dev-info">
+            <p id="ui-dev-by">Designed & Developed by</p>
+            <p id="dev-name">Yassin Mohab Mohamed</p>
+        </div>
+        <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 10px;">© 2025 SFR - v8.1</p>
         <span style="color:var(--primary); cursor:pointer; text-decoration:underline" onclick="openPrivacy()">Privacy Policy | سياسة الخصوصية</span>
     </footer>
 </div>
@@ -212,19 +460,30 @@
     <div class="calc-box">
         <div class="calc-screen" id="calcDisplay">0</div>
         <div class="calc-grid">
-            <button onclick="calcClear()" style="color:var(--danger)">C</button>
+            <button onclick="calcClear()" class="cl">C</button>
             <button onclick="calcPop()">⌫</button>
-            <button onclick="calcIn('/')" style="background:var(--primary); color:white">÷</button>
-            <button onclick="calcIn('*')" style="background:var(--primary); color:white">×</button>
-            <button onclick="calcIn('7')">7</button><button onclick="calcIn('8')">8</button><button onclick="calcIn('9')">9</button>
-            <button onclick="calcIn('-')" style="background:var(--primary); color:white">-</button>
-            <button onclick="calcIn('4')">4</button><button onclick="calcIn('5')">5</button><button onclick="calcIn('6')">6</button>
-            <button onclick="calcIn('+')" style="background:var(--primary); color:white">+</button>
-            <button onclick="calcIn('1')">1</button><button onclick="calcIn('2')">2</button><button onclick="calcIn('3')">3</button>
-            <button onclick="calcRes()" style="background:var(--primary); color:white; grid-row: span 2;">=</button>
+            <button onclick="calcIn('/')" class="op">÷</button>
+            <button onclick="calcIn('*')" class="op">×</button>
+            
+            <button onclick="calcIn('7')">7</button>
+            <button onclick="calcIn('8')">8</button>
+            <button onclick="calcIn('9')">9</button>
+            <button onclick="calcIn('-')" class="op">-</button>
+            
+            <button onclick="calcIn('4')">4</button>
+            <button onclick="calcIn('5')">5</button>
+            <button onclick="calcIn('6')">6</button>
+            <button onclick="calcIn('+')" class="op">+</button>
+            
+            <button onclick="calcIn('1')">1</button>
+            <button onclick="calcIn('2')">2</button>
+            <button onclick="calcIn('3')">3</button>
+            <button onclick="calcRes()" class="eq">=</button>
+            
             <button onclick="calcIn('0')" style="grid-column: span 2;">0</button>
             <button onclick="calcIn('.')">.</button>
-            <button onclick="closeCalc()" style="grid-column: span 4; background:var(--danger); color:white; margin-top:10px">Close</button>
+            
+            <button onclick="closeCalc()" style="grid-column: span 4; background:#64748b; color:white; margin-top:10px; padding: 12px;">Close / إغلاق</button>
         </div>
     </div>
 </div>
@@ -236,17 +495,16 @@
             <h2>Privacy Policy</h2>
             <p><strong>SFR app was developed by Yassin Mohab Mohamed</strong></p>
             <p><strong>1. Data Storage:</strong> All your financial data, transactions, and account names are stored locally on your device's browser memory (LocalStorage). We do not have access to your data.</p>
-            <p><strong>2. No Cloud Sync:</strong> This app does not use any servers or cloud databases. If you clear your browser cache or delete site data, your records will be permanently lost unless you have a backup.</p>
-            <p><strong>3. Ads & Third-Party Disclosure:</strong> We use Google AdMob to display advertisements to support the ongoing development of this application. Google may use anonymous advertising identifiers to serve ads tailored to your interests. We guarantee that these identifiers are never linked to your private financial data stored within the app.</p>
-            <p><strong>4. Access Permissions & Privacy:</strong> This app is designed to fully protect your privacy; therefore, it does not request any system permissions, such as access to your camera, location, contacts, or personal photos. The app operates completely independently and only requires access to the browser's local storage (LocalStorage) to save the financial data you enter yourself, ensuring your information remains solely under your control.</p>
-            <p><strong>5. Security:</strong> The password feature is a local barrier. It is not encrypted on a server. It is designed for basic privacy from people using the same device.</p>
+            <p><strong>2. No Cloud Sync:</strong> This app does not use any servers or cloud databases.</p>
+            <p><strong>3. Ads & Third-Party Disclosure:</strong> We use Google AdMob to display advertisements.</p>
+            <p><strong>4. Access Permissions:</strong> This app does not request any system permissions.</p>
+            <p><strong>5. Security:</strong> The password feature is a local barrier.</p>
             
             <h2 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 30px;">سياسة الخصوصية</h2>
-            <p><strong>1. تخزين البيانات:</strong> يتم تخزين جميع بياناتك المالية ومعاملاتك وأسماء حساباتك محلياً في ذاكرة متصفح جهازك (LocalStorage). نحن لا نملك أي وصول إلى بياناتك.</p>
-            <p><strong>2. لا يوجد مزامنة سحابية:</strong> هذا التطبيق لا يستخدم أي خوادم أو قواعد بيانات سحابية. إذا قمت بمسح ذاكرة التخزين المؤقت للمتصفح، فستفقد سجلاتك نهائياً.</p>
-            <p><strong>3. إدارة الإعلانات والمُعلنين:</strong> نحن نستخدم خدمه Google AdMob لعرض الإعلانات لدعم استمرار التطبيق. قد يستخدم جوجل معرفات إعلانية مجهولة لتقديم إعلانات تناسب اهتماماتك. نؤكد أنه لا يتم ربط هذه المعرفات ببياناتك المالية الخاصة المخزنة داخل التطبيق.</p>
-            <p><strong>4. صلاحيات الوصول والخصوصية:</strong> هذا التطبيق مصمم لحماية خصوصيتك بشكل كامل؛ لذا فهو لا يطلب أي صلاحيات وصول  إلى نظام جهازك، مثل الكاميرا، أو الموقع، أو قائمة الأسماء، أو الصور الشخصية. يعمل التطبيق بشكل مستقل تماماً ولا يحتاج إلا للوصول إلى ذاكرة التخزين المحلية للمتصفح لحفظ بياناتك المالية التي تدخلها بنفسك، مما يضمن بقاء معلوماتك تحت سيطرتك فقط.</p>
-            <p><strong>5. الأمان:</strong> ميزة كلمة المرور هي حاجز محلي فقط وليست مشفرة على خادم خارجي. هي مصممة للخصوصية الأساسية من الأشخاص الذين يستخدمون نفس الجهاز.</p>
+            <p><strong>1. تخزين البيانات:</strong> يتم تخزين بياناتك محلياً في المتصفح.</p>
+            <p><strong>2. لا يوجد مزامنة سحابية:</strong> التطبيق لا يستخدم خوادم خارجية.</p>
+            <p><strong>3. الإعلانات:</strong> نستخدم Google AdMob لدعم التطبيق.</p>
+            <p><strong>4. الصلاحيات:</strong> لا نطلب أي وصول للكاميرا أو الصور.</p>
         </div>
     </div>
 </div>
@@ -258,6 +516,9 @@
     let currentIdx = 0;
     let accounts = JSON.parse(localStorage.getItem("sfr_v6_data")) || [{ name: "Main Account", initial: 0, transactions: [] }];
     let sfrPass = localStorage.getItem("sfr_v6_pass");
+
+    // Simplified Profile Data (Name & Pic only)
+    let profileData = JSON.parse(localStorage.getItem("sfr_profile")) || { name: "", pic: "" };
 
     const CATEGORIES = {
         en: ["🏋️ Sport", "🎁 Gift", "🍔 Food", "🛒 Groceries", "🚗 Transport", "🛍️ Shopping", "📱 Bills", "🏠 Rent", "💊 Health", "🎓 Education", "🎮 Fun", "✈️ Travel", "📈 Invest", "💰 Salary", "➕ Other"],
@@ -271,7 +532,8 @@
             addAcc: "+ New", optExp: "Expense (-)", optInc: "Income (+)", devBy: "Designed & Developed by", initBtn: "Initial Balance", errPass: "Wrong Current Password!",
             confirmDel: "Are you sure?", enterAccName: "Account Name:", enterNewPass: "New Password:", enterCurrPass: "Current Password:",
             amt: "Edit Amount:", desc: "Edit Description:", selectCat: "📁 Change Category:", loginErr: "⚠️ Wrong Password!",
-            searchPlace: "Search by name or description..."
+            searchPlace: "Search by name or description...",
+            menuProf: "Profile Settings", profTitle: "Profile", labelName: "Your Name", profSave: "Save Profile", welcome: "Welcome", loginPrompt: "Login to set your name and photo!"
         },
         ar: { 
             title: "لوحة تحكم SFR", gInc: "الدخل", gExp: "المصاريف", gNet: "الثروة", init: "البداية", inc: "داخل", exp: "خارج", bal: "الرصيد", hist: "السجل", save: "حفظ في السجل",
@@ -279,19 +541,25 @@
             addAcc: "+ جديد", optExp: "مصروف (-)", optInc: "دخل (+)", devBy: "تم التصميم والتطوير بواسطة", initBtn: "الرصيد الافتتاحي", errPass: "كلمة السر الحالية خاطئة!",
             confirmDel: "هل أنت متأكد؟", enterAccName: "اسم الحساب:", enterNewPass: "كلمة السر الجديدة:", enterCurrPass: "كلمة السر الحالية:",
             amt: "تعديل المبلغ:", desc: "تعديل الوصف:", selectCat: "📁 تغيير التصنيف:", loginErr: "⚠️ كلمة السر خاطئة!",
-            searchPlace: "ابحث بالاسم أو الوصف..."
+            searchPlace: "ابحث بالاسم أو الوصف...",
+            menuProf: "إعدادات البروفايل", profTitle: "البروفايل", labelName: "اسم المستخدم", profSave: "حفظ البيانات", welcome: "أهلاً بك", loginPrompt: "سجل الآن لوضع اسمك وصورتك!"
         }
     };
 
     window.onload = () => {
         applyTheme();
         updateUI();
+        loadProfileUI();
         setTimeout(() => {
             document.getElementById("splash-screen").style.opacity = "0";
             setTimeout(() => {
                 document.getElementById("splash-screen").style.display = "none";
                 if(sfrPass) document.getElementById("lock-screen").style.display = "flex";
-                else { document.getElementById("mainApp").style.display = "block"; render(); }
+                else { 
+                    document.getElementById("mainApp").style.display = "block"; 
+                    render(); 
+                    checkLoginNotif();
+                }
             }, 800);
         }, 2000);
     };
@@ -299,16 +567,37 @@
     function toggleMenu(e) { 
         if(e) e.stopPropagation();
         const d = document.getElementById("dropdown"); 
-        d.style.display = (d.style.display === "block") ? "none" : "block"; 
+        const btn = document.getElementById("menuBtn");
+        
+        if (d.style.display === "block") {
+            d.style.display = "none";
+            btn.classList.remove("active");
+        } else {
+            d.style.display = "block";
+            btn.classList.add("active");
+        }
+    }
+
+    function closeMenuEverywhere() {
+        const d = document.getElementById("dropdown");
+        const btn = document.getElementById("menuBtn");
+        if (d && d.style.display === "block") {
+            d.style.display = "none";
+            btn.classList.remove("active");
+        }
     }
 
     window.addEventListener('click', function(e) {
         const dropdown = document.getElementById("dropdown");
-        const btn = document.querySelector(".menu-dot-btn");
+        const btn = document.getElementById("menuBtn");
         if (dropdown && dropdown.style.display === "block" && !dropdown.contains(e.target) && e.target !== btn) {
-            dropdown.style.display = "none";
+            closeMenuEverywhere();
         }
     });
+
+    window.addEventListener('scroll', function() {
+        closeMenuEverywhere();
+    }, true);
 
     function toggleLang() { lang = (lang === "en") ? "ar" : "en"; localStorage.setItem("sfr_lang", lang); location.reload(); }
     function toggleTheme() { theme = (theme === "light") ? "dark" : "light"; localStorage.setItem("sfr_theme", theme); applyTheme(); }
@@ -343,6 +632,12 @@
         document.getElementById("ui-dev-by").innerText = d.devBy;
         document.getElementById("lock-error").innerText = d.loginErr;
         document.getElementById("searchInput").placeholder = d.searchPlace;
+        
+        document.getElementById("ui-menu-profile").innerText = d.menuProf;
+        document.getElementById("ui-profile-title").innerText = d.profTitle;
+        document.getElementById("ui-label-name").innerText = d.labelName;
+        document.getElementById("ui-prof-save").innerText = d.profSave;
+        document.getElementById("ui-login-text").innerText = d.loginPrompt;
 
         const catS = document.getElementById("catSelect");
         catS.innerHTML = "";
@@ -352,6 +647,68 @@
         mS.innerHTML = `<option value="all">${lang === 'ar' ? 'الكل' : 'All Time'}</option>`;
         const months = lang === 'ar' ? ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"] : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         months.forEach((m, i) => mS.innerHTML += `<option value="${i}">${m}</option>`);
+        mS.onchange = render;
+    }
+
+    // Profile Logic (No Currency)
+    function openProfile() { document.getElementById("profile-page").style.display = "block"; closeMenuEverywhere(); }
+    function closeProfile() { document.getElementById("profile-page").style.display = "none"; }
+    function triggerPicUpload() { document.getElementById("pic-upload").click(); }
+    
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById("profile-pic-preview").src = e.target.result;
+                profileData.pic = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function saveProfile() {
+        profileData.name = document.getElementById("prof-name").value;
+        localStorage.setItem("sfr_profile", JSON.stringify(profileData));
+        loadProfileUI();
+        Swal.fire({ icon: 'success', title: lang === 'ar' ? 'تم الحفظ!' : 'Profile Saved!', timer: 1500, showConfirmButton: false });
+        closeProfile();
+        checkLoginNotif();
+    }
+
+    function loadProfileUI() {
+        document.getElementById("prof-name").value = profileData.name;
+        const miniPic = document.getElementById("mini-profile-pic");
+        
+        if(profileData.pic) {
+            document.getElementById("profile-pic-preview").src = profileData.pic;
+            miniPic.src = profileData.pic;
+            miniPic.style.display = "block";
+        } else if (profileData.name) {
+            miniPic.src = `https://ui-avatars.com/api/?name=${profileData.name}&background=6366f1&color=fff`;
+            miniPic.style.display = "block";
+        } else {
+            miniPic.style.display = "none";
+        }
+        
+        if(profileData.name) {
+            document.getElementById("welcome-area").innerText = `${dict[lang].welcome}, ${profileData.name}`;
+        } else {
+            document.getElementById("welcome-area").innerText = "";
+        }
+    }
+
+    function checkLoginNotif() {
+        const notif = document.getElementById("login-notif");
+        if(!profileData.name) notif.style.display = "flex";
+        else notif.style.display = "none";
+    }
+
+    function setType(val) {
+        document.getElementById("typeInp").value = val;
+        document.querySelectorAll(".type-btn").forEach(btn => {
+            btn.classList.remove("active");
+            if(btn.getAttribute("data-type") === val) btn.classList.add("active");
+        });
     }
 
     function render() {
@@ -369,23 +726,17 @@
         cur.transactions.forEach((t, i) => {
             const tDate = new Date(t.date);
             const matchesMonth = filter === "all" || tDate.getMonth() == filter;
-            
-            // فلتر البحث الاحترافي
             const matchesSearch = t.cat.toLowerCase().includes(searchQuery) || 
                                   t.desc.toLowerCase().includes(searchQuery) ||
                                   (t.catIdx !== undefined && CATEGORIES[lang][t.catIdx].toLowerCase().includes(searchQuery));
 
             if(matchesMonth) { 
                 if(t.type === "income") cInc += t.amt; else cExp += t.amt;
-                
-                // عرض النتائج اللي بتطابق البحث فقط داخل الفلتر الزمني
                 if(matchesSearch) {
                     const dStr = tDate.toLocaleDateString(lang==='ar'?'ar-EG':'en-GB', { day: '2-digit', month: 'short' });
                     const tStr = tDate.toLocaleTimeString(lang==='ar'?'ar-EG':'en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
-                    
                     let displayCat = t.cat;
                     if(t.catIdx !== undefined) { displayCat = CATEGORIES[lang][t.catIdx]; }
-                    
                     list.innerHTML = `<div class="item"><span><span class="hist-cat">${displayCat}</span><br><small style="color:#64748b">${t.desc || ''}</small><br><small style="color:#94a3b8; font-size:0.7rem">📅 ${dStr} | 🕒 ${tStr}</small></span><div style="display:flex; align-items:center; gap:8px"><b class="blur-val" style="color:${t.type==='income'?'var(--success)':'var(--danger)'}">${t.amt.toLocaleString()}</b><button onclick="editFull(${i})" style="background:none; border:none; cursor:pointer">✏️</button><button onclick="delT(${i})" style="background:none; border:none; color:red; cursor:pointer">🗑️</button></div></div>` + list.innerHTML;
                 }
             }
@@ -408,6 +759,7 @@
                 date: new Date().toISOString() 
             }); 
             save(); render(); e.target.reset(); 
+            setType('expense');
         } 
     }
     
@@ -467,22 +819,34 @@
     function verifyLock() { 
         const input = document.getElementById("unlockPass");
         const errorMsg = document.getElementById("lock-error");
+        const unlockSound = document.getElementById("unlockSound");
+
         if(input.value === sfrPass) { 
-            document.getElementById("lock-screen").style.display = "none"; 
-            document.getElementById("mainApp").style.display = "block"; 
+            input.style.border = "2px solid var(--success)";
+            input.style.boxShadow = "0 0 12px rgba(34, 197, 94, 0.4)";
             errorMsg.style.display = "none";
-            render(); 
+            if(unlockSound) unlockSound.play();
+            setTimeout(() => {
+                document.getElementById("lock-screen").style.opacity = "0"; 
+                setTimeout(() => {
+                    document.getElementById("lock-screen").style.display = "none"; 
+                    document.getElementById("mainApp").style.display = "block"; 
+                    render(); 
+                    checkLoginNotif();
+                }, 400);
+            }, 1000);
         } else {
             errorMsg.style.display = "block";
             input.value = "";
             input.focus();
             input.style.border = "2px solid var(--danger)";
+            input.style.boxShadow = "none";
         }
     }
 
     function hideLockError() {
         document.getElementById("lock-error").style.display = "none";
-        document.getElementById("unlockPass").style.border = "1px solid #ddd";
+        document.getElementById("unlockPass").style.border = "2px solid var(--border)";
     }
 
     async function checkCurrentPass() {
@@ -506,16 +870,17 @@
         } 
     }
 
-    let cExp = "0";
-    function openCalc() { document.getElementById("calcModal").style.display = "flex"; }
+    let cExp2 = "0"; 
+    function openCalc() { document.getElementById("calcModal").style.display = "flex"; closeMenuEverywhere(); }
     function closeCalc() { document.getElementById("calcModal").style.display = "none"; }
-    function calcIn(v) { if(cExp === "0") cExp = v; else cExp += v; document.getElementById("calcDisplay").innerText = cExp; }
-    function calcClear() { cExp = "0"; document.getElementById("calcDisplay").innerText = cExp; }
-    function calcPop() { cExp = cExp.slice(0, -1); if(cExp==="") cExp="0"; document.getElementById("calcDisplay").innerText = cExp; }
-    function calcRes() { try { cExp = eval(cExp).toString(); document.getElementById("calcDisplay").innerText = cExp; } catch { cExp = "Error"; document.getElementById("calcDisplay").innerText = cExp; cExp = "0"; } }
+    function calcIn(v) { if(cExp2 === "0") cExp2 = v; else cExp2 += v; document.getElementById("calcDisplay").innerText = cExp2; }
+    function calcClear() { cExp2 = "0"; document.getElementById("calcDisplay").innerText = cExp2; }
+    function calcPop() { cExp2 = cExp2.slice(0, -1); if(cExp2==="") cExp2="0"; document.getElementById("calcDisplay").innerText = cExp2; }
+    function calcRes() { try { cExp2 = eval(cExp2).toString(); document.getElementById("calcDisplay").innerText = cExp2; } catch { cExp2 = "Error"; document.getElementById("calcDisplay").innerText = cExp2; cExp2 = "0"; } }
 
     function openPrivacy() { document.getElementById("privacy-modal").style.display = "block"; }
     function closePrivacy() { document.getElementById("privacy-modal").style.display = "none"; }
 </script>
 </body>
 </html>
+
