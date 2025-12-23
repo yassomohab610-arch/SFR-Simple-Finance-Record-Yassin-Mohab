@@ -78,11 +78,16 @@
         .item { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 16px; border-radius: 16px; margin-bottom: 10px; border: 1px solid var(--accent); border-left: 6px solid var(--primary); animation: slideIn 0.3s ease-out; }
         body.rtl .item { border-left: none; border-right: 6px solid var(--primary); }
 
-        /* تعديل الخط في الهيستوري */
         .hist-cat { font-weight: 600; font-size: 1rem; }
-        body.rtl .hist-cat { font-weight: 700; } /* وزن مناسب للخط العربي */
+        body.rtl .hist-cat { font-weight: 700; }
 
-        /* --- SweetAlert Fixed Styles --- */
+        /* البحث في الهيستوري */
+        .search-container { position: relative; margin-bottom: 15px; }
+        .search-input { padding-left: 40px !important; }
+        body.rtl .search-input { padding-left: 12px !important; padding-right: 40px !important; }
+        .search-icon { position: absolute; top: 12px; left: 12px; color: #94a3b8; }
+        body.rtl .search-icon { left: auto; right: 12px; }
+
         .swal2-popup { background: var(--card) !important; color: var(--text) !important; border-radius: 25px !important; padding: 20px !important; }
         .swal2-title { color: var(--text) !important; font-size: 1.2rem !important; margin-bottom: 10px !important; }
         
@@ -130,7 +135,7 @@
     <header>
         <h2 id="ui-title">SFR Dashboard</h2>
         <div class="menu-wrapper">
-            <button class="menu-dot-btn" onclick="toggleMenu()">⋮</button>
+            <button class="menu-dot-btn" onclick="toggleMenu(event)">⋮</button>
             <div id="dropdown" class="dropdown-menu">
                 <button onclick="openCalc()">📟 <span id="ui-menu-calc">Calculator</span></button>
                 <button onclick="toggleLang()">🌐 <span id="ui-menu-lang">Change Language</span></button>
@@ -185,6 +190,12 @@
                 <h3 id="ui-hist">History</h3>
                 <select id="monthFilter" style="width:auto; margin:0" onchange="render()"></select>
             </div>
+            
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by name or description..." oninput="render()">
+            </div>
+
             <div id="transList"></div>
         </div>
     </div>
@@ -223,22 +234,22 @@
         <button class="btn-primary" onclick="closePrivacy()" style="margin-bottom: 20px;">Close / إغلاق</button>
         <div style="text-align: left; line-height: 1.6;">
             <h2>Privacy Policy</h2>
-                   <p><strong>SFR app was developed by Yassin Mohab Mohamed</strong>
-          <p><strong>1. Data Storage:</strong> All your financial data, transactions, and account names are stored locally on your device's browser memory (LocalStorage). We do not have access to your data.</p>
-        <p><strong>2. No Cloud Sync:</strong> This app does not use any servers or cloud databases. If you clear your browser cache or delete site data, your records will be permanently lost unless you have a backup.</p>
-        <p><strong>3. Ads & Third-Party Disclosure:</strong> We use Google AdMob to display advertisements to support the ongoing development of this application. Google may use anonymous advertising identifiers to serve ads tailored to your interests. We guarantee that these identifiers are never linked to your private financial data stored within the app.</p>
-       <p><strong>4. Access Permissions & Privacy:</strong> This app is designed to fully protect your privacy; therefore, it does not request any system permissions, such as access to your camera, location, contacts, or personal photos. The app operates completely independently and only requires access to the browser's local storage (LocalStorage) to save the financial data you enter yourself, ensuring your information remains solely under your control.</p>
-        <p><strong>5. Security:</strong> The password feature is a local barrier. It is not encrypted on a server. It is designed for basic privacy from people using the same device.</p>
-        
-        <h2 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 30px;">سياسة الخصوصية</h2>
-        <p><strong>1. تخزين البيانات:</strong> يتم تخزين جميع بياناتك المالية ومعاملاتك وأسماء حساباتك محلياً في ذاكرة متصفح جهازك (LocalStorage). نحن لا نملك أي وصول إلى بياناتك.</p>
-        <p><strong>2. لا يوجد مزامنة سحابية:</strong> هذا التطبيق لا يستخدم أي خوادم أو قواعد بيانات سحابية. إذا قمت بمسح ذاكرة التخزين المؤقت للمتصفح، فستفقد سجلاتك نهائياً.</p>
-        <p><strong>3. إدارة الإعلانات والمُعلنين:</strong> نحن نستخدم خدمه Google AdMob لعرض الإعلانات لدعم استمرار التطبيق. قد يستخدم جوجل معرفات إعلانية مجهولة لتقديم إعلانات تناسب اهتماماتك. نؤكد أنه لا يتم ربط هذه المعرفات ببياناتك المالية الخاصة المخزنة داخل التطبيق.</p>
-        <p><strong>4. صلاحيات الوصول والخصوصية:</strong> هذا التطبيق مصمم لحماية خصوصيتك بشكل كامل؛ لذا فهو لا يطلب أي صلاحيات وصول  إلى نظام جهازك، مثل الكاميرا، أو الموقع، أو قائمة الأسماء، أو الصور الشخصية. يعمل التطبيق بشكل مستقل تماماً ولا يحتاج إلا للوصول إلى ذاكرة التخزين المحلية للمتصفح لحفظ بياناتك المالية التي تدخلها بنفسك، مما يضمن بقاء معلوماتك تحت سيطرتك فقط.</p>
-        <p><strong>5. الأمان:</strong> ميزة كلمة المرور هي حاجز محلي فقط وليست مشفرة على خادم خارجي. هي مصممة للخصوصية الأساسية من الأشخاص الذين يستخدمون نفس الجهاز.</p>
+            <p><strong>SFR app was developed by Yassin Mohab Mohamed</strong></p>
+            <p><strong>1. Data Storage:</strong> All your financial data, transactions, and account names are stored locally on your device's browser memory (LocalStorage). We do not have access to your data.</p>
+            <p><strong>2. No Cloud Sync:</strong> This app does not use any servers or cloud databases. If you clear your browser cache or delete site data, your records will be permanently lost unless you have a backup.</p>
+            <p><strong>3. Ads & Third-Party Disclosure:</strong> We use Google AdMob to display advertisements to support the ongoing development of this application. Google may use anonymous advertising identifiers to serve ads tailored to your interests. We guarantee that these identifiers are never linked to your private financial data stored within the app.</p>
+            <p><strong>4. Access Permissions & Privacy:</strong> This app is designed to fully protect your privacy; therefore, it does not request any system permissions, such as access to your camera, location, contacts, or personal photos. The app operates completely independently and only requires access to the browser's local storage (LocalStorage) to save the financial data you enter yourself, ensuring your information remains solely under your control.</p>
+            <p><strong>5. Security:</strong> The password feature is a local barrier. It is not encrypted on a server. It is designed for basic privacy from people using the same device.</p>
+            
+            <h2 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 30px;">سياسة الخصوصية</h2>
+            <p><strong>1. تخزين البيانات:</strong> يتم تخزين جميع بياناتك المالية ومعاملاتك وأسماء حساباتك محلياً في ذاكرة متصفح جهازك (LocalStorage). نحن لا نملك أي وصول إلى بياناتك.</p>
+            <p><strong>2. لا يوجد مزامنة سحابية:</strong> هذا التطبيق لا يستخدم أي خوادم أو قواعد بيانات سحابية. إذا قمت بمسح ذاكرة التخزين المؤقت للمتصفح، فستفقد سجلاتك نهائياً.</p>
+            <p><strong>3. إدارة الإعلانات والمُعلنين:</strong> نحن نستخدم خدمه Google AdMob لعرض الإعلانات لدعم استمرار التطبيق. قد يستخدم جوجل معرفات إعلانية مجهولة لتقديم إعلانات تناسب اهتماماتك. نؤكد أنه لا يتم ربط هذه المعرفات ببياناتك المالية الخاصة المخزنة داخل التطبيق.</p>
+            <p><strong>4. صلاحيات الوصول والخصوصية:</strong> هذا التطبيق مصمم لحماية خصوصيتك بشكل كامل؛ لذا فهو لا يطلب أي صلاحيات وصول  إلى نظام جهازك، مثل الكاميرا، أو الموقع، أو قائمة الأسماء، أو الصور الشخصية. يعمل التطبيق بشكل مستقل تماماً ولا يحتاج إلا للوصول إلى ذاكرة التخزين المحلية للمتصفح لحفظ بياناتك المالية التي تدخلها بنفسك، مما يضمن بقاء معلوماتك تحت سيطرتك فقط.</p>
+            <p><strong>5. الأمان:</strong> ميزة كلمة المرور هي حاجز محلي فقط وليست مشفرة على خادم خارجي. هي مصممة للخصوصية الأساسية من الأشخاص الذين يستخدمون نفس الجهاز.</p>
+        </div>
     </div>
 </div>
-
 
 <script>
     let lang = localStorage.getItem("sfr_lang") || "en";
@@ -259,14 +270,16 @@
             menuCalc: "Calculator", menuLang: "العربية", menuTheme: "Dark/Light Mode", menuBlur: "Toggle Blur", setPass: "🔑 Set Password", changePass: "🔄 Change Pass", delPass: "🗑️ Delete Pass", locked: "🔐 SFR Locked", unlock: "Unlock",
             addAcc: "+ New", optExp: "Expense (-)", optInc: "Income (+)", devBy: "Designed & Developed by", initBtn: "Initial Balance", errPass: "Wrong Current Password!",
             confirmDel: "Are you sure?", enterAccName: "Account Name:", enterNewPass: "New Password:", enterCurrPass: "Current Password:",
-            amt: "Edit Amount:", desc: "Edit Description:", selectCat: "📁 Change Category:", loginErr: "⚠️ Wrong Password!"
+            amt: "Edit Amount:", desc: "Edit Description:", selectCat: "📁 Change Category:", loginErr: "⚠️ Wrong Password!",
+            searchPlace: "Search by name or description..."
         },
         ar: { 
             title: "لوحة تحكم SFR", gInc: "الدخل", gExp: "المصاريف", gNet: "الثروة", init: "البداية", inc: "داخل", exp: "خارج", bal: "الرصيد", hist: "السجل", save: "حفظ في السجل",
             menuCalc: "الآلة الحاسبة", menuLang: "English", menuTheme: "الوضع الليلي", menuBlur: "إخفاء الأرقام", setPass: "🔑 إنشاء كلمة سر", changePass: "🔄 تغيير كلمة السر", delPass: "🗑️ حذف كلمة السر", locked: "🔐 SFR مغلق", unlock: "فتح التطبيق",
             addAcc: "+ جديد", optExp: "مصروف (-)", optInc: "دخل (+)", devBy: "تم التصميم والتطوير بواسطة", initBtn: "الرصيد الافتتاحي", errPass: "كلمة السر الحالية خاطئة!",
             confirmDel: "هل أنت متأكد؟", enterAccName: "اسم الحساب:", enterNewPass: "كلمة السر الجديدة:", enterCurrPass: "كلمة السر الحالية:",
-            amt: "تعديل المبلغ:", desc: "تعديل الوصف:", selectCat: "📁 تغيير التصنيف:", loginErr: "⚠️ كلمة السر خاطئة!"
+            amt: "تعديل المبلغ:", desc: "تعديل الوصف:", selectCat: "📁 تغيير التصنيف:", loginErr: "⚠️ كلمة السر خاطئة!",
+            searchPlace: "ابحث بالاسم أو الوصف..."
         }
     };
 
@@ -283,7 +296,20 @@
         }, 2000);
     };
 
-    function toggleMenu() { const d = document.getElementById("dropdown"); d.style.display = (d.style.display === "block") ? "none" : "block"; }
+    function toggleMenu(e) { 
+        if(e) e.stopPropagation();
+        const d = document.getElementById("dropdown"); 
+        d.style.display = (d.style.display === "block") ? "none" : "block"; 
+    }
+
+    window.addEventListener('click', function(e) {
+        const dropdown = document.getElementById("dropdown");
+        const btn = document.querySelector(".menu-dot-btn");
+        if (dropdown && dropdown.style.display === "block" && !dropdown.contains(e.target) && e.target !== btn) {
+            dropdown.style.display = "none";
+        }
+    });
+
     function toggleLang() { lang = (lang === "en") ? "ar" : "en"; localStorage.setItem("sfr_lang", lang); location.reload(); }
     function toggleTheme() { theme = (theme === "light") ? "dark" : "light"; localStorage.setItem("sfr_theme", theme); applyTheme(); }
     function applyTheme() { document.body.classList.toggle("dark", theme === "dark"); }
@@ -316,6 +342,7 @@
         document.getElementById("ui-opt-inc").innerText = d.optInc;
         document.getElementById("ui-dev-by").innerText = d.devBy;
         document.getElementById("lock-error").innerText = d.loginErr;
+        document.getElementById("searchInput").placeholder = d.searchPlace;
 
         const catS = document.getElementById("catSelect");
         catS.innerHTML = "";
@@ -330,17 +357,37 @@
     function render() {
         const accSel = document.getElementById("accSelect"); accSel.innerHTML = ""; accounts.forEach((a, i) => { const o = document.createElement("option"); o.value = i; o.text = a.name; accSel.appendChild(o); }); accSel.value = currentIdx;
         let gInc = 0, gExp = 0, gNet = 0; accounts.forEach(acc => { let accNet = acc.initial; acc.transactions.forEach(t => { if(t.type === "income") { gInc += t.amt; accNet += t.amt; } else { gExp += t.amt; accNet -= t.amt; } }); gNet += accNet; });
-        const cur = accounts[currentIdx]; const filter = document.getElementById("monthFilter").value; let cInc = 0, cExp = 0; const list = document.getElementById("transList"); list.innerHTML = "";
+        
+        const cur = accounts[currentIdx]; 
+        const filter = document.getElementById("monthFilter").value; 
+        const searchQuery = document.getElementById("searchInput").value.toLowerCase();
+        
+        let cInc = 0, cExp = 0; 
+        const list = document.getElementById("transList"); 
+        list.innerHTML = "";
+
         cur.transactions.forEach((t, i) => {
-            const tDate = new Date(t.date); if(filter === "all" || tDate.getMonth() == filter) { if(t.type === "income") cInc += t.amt; else cExp += t.amt;
-                const dStr = tDate.toLocaleDateString(lang==='ar'?'ar-EG':'en-GB', { day: '2-digit', month: 'short' });
-                const tStr = tDate.toLocaleTimeString(lang==='ar'?'ar-EG':'en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const tDate = new Date(t.date);
+            const matchesMonth = filter === "all" || tDate.getMonth() == filter;
+            
+            // فلتر البحث الاحترافي
+            const matchesSearch = t.cat.toLowerCase().includes(searchQuery) || 
+                                  t.desc.toLowerCase().includes(searchQuery) ||
+                                  (t.catIdx !== undefined && CATEGORIES[lang][t.catIdx].toLowerCase().includes(searchQuery));
+
+            if(matchesMonth) { 
+                if(t.type === "income") cInc += t.amt; else cExp += t.amt;
                 
-                let displayCat = t.cat;
-                if(t.catIdx !== undefined) { displayCat = CATEGORIES[lang][t.catIdx]; }
-                
-                // تم استبدال b بـ span مع class يتحكم في الوزن
-                list.innerHTML = `<div class="item"><span><span class="hist-cat">${displayCat}</span><br><small style="color:#64748b">${t.desc || ''}</small><br><small style="color:#94a3b8; font-size:0.7rem">📅 ${dStr} | 🕒 ${tStr}</small></span><div style="display:flex; align-items:center; gap:8px"><b class="blur-val" style="color:${t.type==='income'?'var(--success)':'var(--danger)'}">${t.amt.toLocaleString()}</b><button onclick="editFull(${i})" style="background:none; border:none; cursor:pointer">✏️</button><button onclick="delT(${i})" style="background:none; border:none; color:red; cursor:pointer">🗑️</button></div></div>` + list.innerHTML;
+                // عرض النتائج اللي بتطابق البحث فقط داخل الفلتر الزمني
+                if(matchesSearch) {
+                    const dStr = tDate.toLocaleDateString(lang==='ar'?'ar-EG':'en-GB', { day: '2-digit', month: 'short' });
+                    const tStr = tDate.toLocaleTimeString(lang==='ar'?'ar-EG':'en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
+                    
+                    let displayCat = t.cat;
+                    if(t.catIdx !== undefined) { displayCat = CATEGORIES[lang][t.catIdx]; }
+                    
+                    list.innerHTML = `<div class="item"><span><span class="hist-cat">${displayCat}</span><br><small style="color:#64748b">${t.desc || ''}</small><br><small style="color:#94a3b8; font-size:0.7rem">📅 ${dStr} | 🕒 ${tStr}</small></span><div style="display:flex; align-items:center; gap:8px"><b class="blur-val" style="color:${t.type==='income'?'var(--success)':'var(--danger)'}">${t.amt.toLocaleString()}</b><button onclick="editFull(${i})" style="background:none; border:none; cursor:pointer">✏️</button><button onclick="delT(${i})" style="background:none; border:none; color:red; cursor:pointer">🗑️</button></div></div>` + list.innerHTML;
+                }
             }
         });
         document.getElementById("val-g-inc").innerText = gInc.toLocaleString(); document.getElementById("val-g-exp").innerText = gExp.toLocaleString(); document.getElementById("val-g-net").innerText = gNet.toLocaleString();
@@ -447,7 +494,6 @@
     }
 
     async function handleSetPass() { 
-        toggleMenu(); 
         if(await checkCurrentPass()) {
             const { value: p } = await Swal.fire({ title: dict[lang].enterNewPass, input: 'password', showCancelButton: true, confirmButtonColor: '#6366f1' }); 
             if(p) { localStorage.setItem("sfr_v6_pass", p); sfrPass = p; location.reload(); } 
@@ -455,14 +501,13 @@
     }
 
     async function deletePass() { 
-        toggleMenu();
         if(await checkCurrentPass()) { 
             localStorage.removeItem("sfr_v6_pass"); sfrPass = null; location.reload(); 
         } 
     }
 
     let cExp = "0";
-    function openCalc() { document.getElementById("calcModal").style.display = "flex"; toggleMenu(); }
+    function openCalc() { document.getElementById("calcModal").style.display = "flex"; }
     function closeCalc() { document.getElementById("calcModal").style.display = "none"; }
     function calcIn(v) { if(cExp === "0") cExp = v; else cExp += v; document.getElementById("calcDisplay").innerText = cExp; }
     function calcClear() { cExp = "0"; document.getElementById("calcDisplay").innerText = cExp; }
