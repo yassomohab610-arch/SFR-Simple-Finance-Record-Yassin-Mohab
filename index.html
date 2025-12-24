@@ -13,6 +13,64 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCt8a3DOv_cS4FiMSvNmRG19jk2CWs5__I",
+            authDomain: "sfr-simple-finance-record.firebaseapp.com",
+            projectId: "sfr-simple-finance-record",
+            storageBucket: "sfr-simple-finance-record.firebasestorage.app",
+            messagingSenderId: "812795966400",
+            appId: "1:812795966400:web:35f9c38addf547cc990e25",
+            measurementId: "G-LD1K794XJW"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        // دالة تسجيل الدخول ونقل البيانات للسحاب
+        window.loginWithGoogle = async function() {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                // جلب بيانات الـ 158 مستخدم من LocalStorage
+                const localData = localStorage.getItem("sfr_v6_data"); 
+                
+                if (localData) {
+                    await setDoc(doc(db, "users", user.uid), {
+                        userName: user.displayName,
+                        email: user.email,
+                        profilePic: user.photoURL,
+                        appData: JSON.parse(localData),
+                        lastSync: new Date()
+                    }, { merge: true });
+
+                    // تحديث البروفايل المحلي ببيانات جوجل
+                    let profile = JSON.parse(localStorage.getItem("sfr_profile")) || {};
+                    profile.name = user.displayName;
+                    profile.pic = user.photoURL;
+                    localStorage.setItem("sfr_profile", JSON.stringify(profile));
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم المزامنة!',
+                        text: `أهلاً يا ${user.displayName}، بياناتك الآن في أمان على السحاب.`,
+                        confirmButtonColor: '#6366f1'
+                    }).then(() => location.reload());
+                }
+            } catch (error) {
+                console.error("Firebase Login Error:", error);
+                Swal.fire('خطأ', 'فشل الاتصال بسيرفرات جوجل', 'error');
+            }
+        }
+    </script>
     <style>
         :root { 
             --primary: #6366f1; 
@@ -343,17 +401,17 @@
 <audio id="unlockSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
 
 <div id="splash-screen">
-    <div class="logo-anim">🏦</div>
+    <div class="logo-anim">🪙</div>
     <h1 style="color: white; margin: 15px 0 0 0; letter-spacing: 5px; font-size: 45px;">SFR</h1>
     <p style="color: #6366f1;">Simple Finance Record</p>
     <div class="loading-bar"><div class="loading-progress"></div></div>
 </div>
 
 <div id="lock-screen">
-    <h2 id="ui-locked">🔐 SFR Locked</h2>
+    <h2 id="ui-locked">🔒 SFR Locked</h2>
     <input type="password" id="unlockPass" placeholder="..." style="width: 260px; text-align: center; transition: all 0.3s ease;" oninput="hideLockError()">
     <button class="btn-primary" style="width: 260px;" onclick="verifyLock()" id="ui-unlock-btn">Unlock</button>
-    <div id="lock-error">⚠️ Wrong Password!</div>
+    <div id="lock-error">❌ Wrong Password!</div>
 </div>
 
 <div id="login-notif">
@@ -364,10 +422,16 @@
 <div id="profile-page">
     <div class="profile-card">
         <h2 style="margin-top: 0;" id="ui-profile-title">User Profile</h2>
+        
         <div class="profile-pic-container" onclick="triggerPicUpload()">
             <img id="profile-pic-preview" src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Profile">
             <input type="file" id="pic-upload" hidden accept="image/*" onchange="previewImage(this)">
         </div>
+
+        <button onclick="loginWithGoogle()" style="width: 100%; background: #4285F4; color: white; border: none; padding: 12px; border-radius: 15px; margin-bottom: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);">
+            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" alt="Google">
+            ربط الحساب بالسحاب (Google)
+        </button>
         
         <div class="profile-input-group">
             <label id="ui-label-name">Full Name</label>
@@ -389,15 +453,15 @@
             </div>
         </div>
         <div class="menu-wrapper" style="position: relative;">
-            <button class="menu-dot-btn" id="menuBtn" onclick="toggleMenu(event)">⋮</button>
+            <button class="menu-dot-btn" id="menuBtn" onclick="toggleMenu(event)">⚙️</button>
             <div id="dropdown" class="dropdown-menu">
                 <button onclick="openProfile()">👤 <span id="ui-menu-profile">Profile Settings</span></button>
-                <button onclick="openCalc()">📟 <span id="ui-menu-calc">Calculator</span></button>
+                <button onclick="openCalc()">🧮 <span id="ui-menu-calc">Calculator</span></button>
                 <button onclick="toggleLang()">🌐 <span id="ui-menu-lang">Change Language</span></button>
                 <button onclick="toggleTheme()">🌓 <span id="ui-menu-theme">Dark/Light Mode</span></button>
-                <button onclick="togglePrivacy()">👁️ <span id="ui-menu-blur">Toggle Blur</span></button>
-                <button id="m-set-pass" onclick="handleSetPass()">🔑 Set Password</button>
-                <button id="m-del-pass" onclick="deletePass()" style="color:var(--danger)">🗑️ Delete Pass</button>
+                <button onclick="togglePrivacy()">👓 <span id="ui-menu-blur">Toggle Blur</span></button>
+                <button id="m-set-pass" onclick="handleSetPass()">🔐 Set Password</button>
+                <button id="m-del-pass" onclick="deletePass()" style="color:var(--danger)">🔓 Delete Pass</button>
                 <button onclick="location.reload()">🔒 Lock App</button>
             </div>
         </div>
@@ -422,7 +486,7 @@
                 <select id="accSelect" onchange="switchAccount()"></select>
                 <div class="btn-row">
                     <button class="btn-tool" onclick="addAcc()" id="ui-add-acc">+ New</button>
-                    <button class="btn-tool" onclick="renameAcc()">✏️</button>
+                    <button class="btn-tool" onclick="renameAcc()">📝</button>
                     <button class="btn-tool" onclick="delAcc()" style="color:var(--danger)">🗑️</button>
                     <button class="btn-tool" onclick="modifyInitial()" style="background:#f59e0b; color:white" id="ui-init-btn">Initial Balance</button>
                 </div>
@@ -534,19 +598,19 @@
 
         <div class="privacy-section" dir="rtl">
             <h2>سياسة الخصوصية وشفافية البيانات</h2>
-            <p>تم تطوير تطبيق <strong>SFR</strong> بواسطة المبرمج <strong>ياسين مهاب محمد</strong> مع الالتزام التام بحماية خصوصية المستخدم.</p>
+            <p>تم تطوير تطبيق <strong>SFR</strong> بواسطة <strong>ياسين محب محمد</strong> مع الالتزام التام بحماية خصوصية المستخدم.</p>
             
-            <h3>١. سيادة البيانات المحلية</h3>
-            <p>بياناتك المالية ملك لك وحدك. يتم تخزين جميع السجلات، تاريخ المعاملات، وأسماء الحسابات حصرياً في ذاكرة المتصفح المحلية (LocalStorage) الخاصة بجهازك. لا نملك أي وسيلة تقنية للوصول إلى هذه البيانات أو الاطلاع عليها.</p>
+            <h3>1. سيادة البيانات المحلية</h3>
+            <p>بياناتك المالية ملك لك وحدك. يتم تخزين جميع السجلات وتواريخ المعاملات وأسماء الحسابات ومعلومات الملف الشخصي بشكل حصري داخل ذاكرة المتصفح (LocalStorage) الخاصة بجهازك. لا نملك أي وسيلة تقنية للوصول إلى بياناتك.</p>
             
-            <h3>٢. انعدام الاتصال السحابي</h3>
-            <p>لضمان أقصى درجات الأمان، يعمل التطبيق بدون أي خوادم خارجية أو قواعد بيانات سحابية. لا توجد مزامنة خلفية؛ بياناتك لا تغادر جهازك الفعلي أبداً.</p>
+            <h3>2. انعدام الاتصال السحابي</h3>
+            <p>لضمان أقصى درجات الأمان، يعمل هذا التطبيق بدون أي خوادم خارجية أو قواعد بيانات سحابية. لا يوجد مزامنة خلفية؛ بياناتك لا تغادر جهازك أبداً.</p>
             
-            <h3>٣. الإعلانات والتحليلات</h3>
-            <p>نستخدم خدمة <strong>Google AdMob</strong> لعرض الإعلانات. قد تقوم هذه الخدمات بجمع معرفات أجهزة مجهولة لتقديم إعلانات ذات صلة، وذلك وفقاً لسياسات خصوصية شركة Google.</p>
+            <h3>3. الإعلانات والتحليلات</h3>
+            <p>نستخدم خدمة <strong>Google AdMob</strong> لتقديم إعلانات غير مزعجة. قد تقوم هذه الخدمات بطرف ثالث بجمع معرفات أجهزة مجهولة لتقديم إعلانات ذات صلة، وتخضع لسياسات خصوصية Google.</p>
             
-            <h3>٤. التصاريح والأمان</h3>
-            <p>لا يتطلب التطبيق الوصول إلى الكاميرا أو الأسماء أو الموقع الجغرافي. خاصية "قفل التطبيق" هي طبقة حماية محلية تهدف لمنع الوصول الفعلي غير المصرح به للتطبيق على جهازك.</p>
+            <h3>4. الأذونات والأمان</h3>
+            <p>لا يتطلب التطبيق الوصول إلى الكاميرا أو جهات الاتصال أو موقعك الجغرافي. ميزة "قفل التطبيق" هي طبقة أمان محلية تهدف لمنع الوصول الفعلي غير المصرح به للتطبيق على جهازك.</p>
         </div>
         
         <p style="text-align:center; opacity:0.6; font-size:0.8rem; margin-top:20px;">Last Updated: December 2025</p>
@@ -565,30 +629,30 @@
     let profileData = JSON.parse(localStorage.getItem("sfr_profile")) || { name: "", pic: "" };
 
     const CATEGORIES = {
-        en: ["🏋️ Sport", "🎁 Gift", "🍔 Food", "🛒 Groceries", "🚗 Transport", "🛍️ Shopping", "📱 Bills", "🏠 Rent", "💊 Health", "🎓 Education", "🎮 Fun", "✈️ Travel", "📈 Invest", "💰 Salary", "➕ Other"],
-        ar: ["🏋️ رياضة", "🎁 هدية", "🍔 طعام", "🛒 بقالة", "🚗 مواصلات", "🛍️ تسوق", "📱 فواتير", "🏠 سكن", "💊 صحة", "🎓 تعليم", "🎮 ترفيه", "✈️ سفر", "📈 استثمار", "💰 راتب", "➕ أخرى"]
+        en: ["⚽ Sport", "🎁 Gift", "🍔 Food", "🛒 Groceries", "🚌 Transport", "🛍️ Shopping", "📑 Bills", "🏠 Rent", "🏥 Health", "🎓 Education", "🎮 Fun", "✈️ Travel", "📈 Invest", "💵 Salary", "❓ Other"],
+        ar: ["⚽ الرياضة", "🎁 الهدايا", "🍔 الطعام", "🛒 البقالة", "🚌 المواصلات", "🛍️ تسوق", "📑 الفواتير", "🏠 السكن", "🏥 الصحة", "🎓 التعليم", "🎮 الترفيه", "✈️ السفر", "📈 الاستثمار", "💵 الراتب", "❓ أخرى"]
     };
 
     const dict = {
         en: { 
             title: "SFR Dashboard", gInc: "Incomes", gExp: "Expenses", gNet: "Net Worth", init: "Initial", inc: "In", exp: "Out", bal: "Balance", hist: "History", save: "Post to SFR",
-            menuCalc: "Calculator", menuLang: "العربية", menuTheme: "Dark/Light Mode", menuBlur: "Toggle Blur", setPass: "🔑 Set Password", changePass: "🔄 Change Pass", delPass: "🗑️ Delete Pass", locked: "🔐 SFR Locked", unlock: "Unlock",
+            menuCalc: "Calculator", menuLang: "اللغة العربية", menuTheme: "Dark/Light Mode", menuBlur: "Toggle Blur", setPass: "🔐 Set Password", changePass: "🔐 Change Pass", delPass: "🔓 Delete Pass", locked: "🔒 SFR Locked", unlock: "Unlock",
             addAcc: "+ New", optExp: "Expense (-)", optInc: "Income (+)", devBy: "Designed & Developed by", initBtn: "Initial Balance", errPass: "Wrong Current Password!",
             confirmDel: "Are you sure?", enterAccName: "Account Name:", enterNewPass: "New Password:", enterCurrPass: "Current Password:",
-            amt: "Edit Amount:", desc: "Edit Description:", selectCat: "📁 Change Category:", loginErr: "⚠️ Wrong Password!",
+            amt: "Edit Amount:", desc: "Edit Description:", selectCat: "🔄 Change Category:", loginErr: "❌ Wrong Password!",
             searchPlace: "Search by name or description...",
             menuProf: "Profile Settings", profTitle: "Profile", labelName: "Your Name", profSave: "Save Profile", welcome: "Welcome", loginPrompt: "Login to set your name and photo!",
             lType: "TYPE", lCat: "CATEGORY", lDet: "DETAILS", lAmt: "AMOUNT", dPlace: "What is this for?"
         },
         ar: { 
-            title: "لوحة تحكم SFR", gInc: "الدخل", gExp: "المصاريف", gNet: "الثروة", init: "البداية", inc: "داخل", exp: "خارج", bal: "الرصيد", hist: "السجل", save: "حفظ في السجل",
-            menuCalc: "الآلة الحاسبة", menuLang: "English", menuTheme: "الوضع الليلي", menuBlur: "إخفاء الأرقام", setPass: "🔑 إنشاء كلمة سر", changePass: "🔄 تغيير كلمة السر", delPass: "🗑️ حذف كلمة السر", locked: "🔐 SFR مغلق", unlock: "فتح التطبيق",
+            title: "لوحة تحكم SFR", gInc: "المدخولات", gExp: "المصروفات", gNet: "الصافي", init: "الافتتاحي", inc: "داخل", exp: "خارج", bal: "الرصيد", hist: "السجل", save: "حفظ في السجل",
+            menuCalc: "الآلة الحاسبة", menuLang: "English", menuTheme: "تبديل المظهر", menuBlur: "تفعيل التعتيم", setPass: "🔐 تعيين كلمة سر", changePass: "🔐 تغيير كلمة السر", delPass: "🔓 حذف كلمة السر", locked: "🔒 SFR مقفل", unlock: "فتح القفل",
             addAcc: "+ جديد", optExp: "مصروف (-)", optInc: "دخل (+)", devBy: "تم التصميم والتطوير بواسطة", initBtn: "الرصيد الافتتاحي", errPass: "كلمة السر الحالية خاطئة!",
             confirmDel: "هل أنت متأكد؟", enterAccName: "اسم الحساب:", enterNewPass: "كلمة السر الجديدة:", enterCurrPass: "كلمة السر الحالية:",
-            amt: "تعديل المبلغ:", desc: "تعديل الوصف:", selectCat: "📁 تغيير التصنيف:", loginErr: "⚠️ كلمة السر خاطئة!",
+            amt: "تعديل المبلغ:", desc: "تعديل الوصف:", selectCat: "🔄 تغيير الفئة:", loginErr: "❌ كلمة السر خاطئة!",
             searchPlace: "ابحث بالاسم أو الوصف...",
-            menuProf: "إعدادات البروفايل", profTitle: "البروفايل", labelName: "اسم المستخدم", profSave: "حفظ البيانات", welcome: "أهلاً بك", loginPrompt: "سجل الآن لوضع اسمك وصورتك!",
-            lType: "النوع", lCat: "الفئة", lDet: "التفاصيل", lAmt: "المبلغ", dPlace: "فيما استخدمت هذا المبلغ؟"
+            menuProf: "إعدادات الحساب", profTitle: "الملف الشخصي", labelName: "اسمك الكريم", profSave: "حفظ البيانات", welcome: "مرحباً بك", loginPrompt: "سجل الآن لحفظ اسمك وصورتك!",
+            lType: "النوع", lCat: "الفئة", lDet: "التفاصيل", lAmt: "المبلغ", dPlace: "ماذا اشتريت أو قبضت؟"
         }
     };
 
@@ -616,7 +680,7 @@
         const btn = document.getElementById("menuBtn");
         
         if (d.style.display === "block") {
-            closeMenuEverywhere(); // Use the animated close function
+            closeMenuEverywhere(); 
         } else {
             d.style.display = "block";
             d.classList.remove("closing");
@@ -631,11 +695,10 @@
             d.classList.add("closing");
             if(btn) btn.classList.remove("active");
             
-            // Wait for animation to finish before hiding display
             setTimeout(() => {
                 d.style.display = "none";
                 d.classList.remove("closing");
-            }, 300); // matches CSS animation duration
+            }, 300); 
         }
     }
 
@@ -691,7 +754,6 @@
         document.getElementById("ui-prof-save").innerText = d.profSave;
         document.getElementById("ui-login-text").innerText = d.loginPrompt;
 
-        // Added dynamic labels for input form
         document.getElementById("ui-label-type").innerText = d.lType;
         document.getElementById("ui-label-cat").innerText = d.lCat;
         document.getElementById("ui-label-det").innerText = d.lDet;
@@ -709,7 +771,6 @@
         mS.onchange = render;
     }
 
-    // Profile Logic (No Currency)
     function openProfile() { document.getElementById("profile-page").style.display = "block"; closeMenuEverywhere(); }
     function closeProfile() { document.getElementById("profile-page").style.display = "none"; }
     function triggerPicUpload() { document.getElementById("pic-upload").click(); }
@@ -785,8 +846,6 @@
         cur.transactions.forEach((t, i) => {
             const tDate = new Date(t.date);
             const matchesMonth = filter === "all" || tDate.getMonth() == filter;
-            
-            // Logic for date search
             const dateStr = tDate.toLocaleDateString(lang==='ar'?'ar-EG':'en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toLowerCase();
             const fullIsoDate = tDate.toISOString().split('T')[0];
 
@@ -803,7 +862,7 @@
                     const tStr = tDate.toLocaleTimeString(lang==='ar'?'ar-EG':'en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
                     let displayCat = t.cat;
                     if(t.catIdx !== undefined) { displayCat = CATEGORIES[lang][t.catIdx]; }
-                    list.innerHTML = `<div class="item"><span><span class="hist-cat">${displayCat}</span><br><small style="color:#64748b">${t.desc || ''}</small><br><small style="color:#94a3b8; font-size:0.7rem">📅 ${dStr} | 🕒 ${tStr}</small></span><div style="display:flex; align-items:center; gap:8px"><b class="blur-val" style="color:${t.type==='income'?'var(--success)':'var(--danger)'}">${t.amt.toLocaleString()}</b><button onclick="editFull(${i})" style="background:none; border:none; cursor:pointer">✏️</button><button onclick="delT(${i})" style="background:none; border:none; color:red; cursor:pointer">🗑️</button></div></div>` + list.innerHTML;
+                    list.innerHTML = `<div class="item"><span><span class="hist-cat">${displayCat}</span><br><small style="color:#64748b">${t.desc || ''}</small><br><small style="color:#94a3b8; font-size:0.7rem">📅 ${dStr} | 🕒 ${tStr}</small></span><div style="display:flex; align-items:center; gap:8px"><b class="blur-val" style="color:${t.type==='income'?'var(--success)':'var(--danger)'}">${t.amt.toLocaleString()}</b><button onclick="editFull(${i})" style="background:none; border:none; cursor:pointer">📝</button><button onclick="delT(${i})" style="background:none; border:none; color:red; cursor:pointer">🗑️</button></div></div>` + list.innerHTML;
                 }
             }
         });
