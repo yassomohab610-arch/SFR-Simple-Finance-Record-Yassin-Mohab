@@ -34,16 +34,11 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        // دالة تسجيل الدخول ونقل البيانات للسحاب
-        window.loginWithGoogle = async function() {
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                
-                // جلب بيانات الـ 158 مستخدم من LocalStorage
-                const localData = localStorage.getItem("sfr_v6_data"); 
-                
-                if (localData) {
+        // دالة لمزامنة البيانات للسحاب
+        async function syncDataToCloud(user) {
+            const localData = localStorage.getItem("sfr_v6_data");
+            if (localData) {
+                try {
                     await setDoc(doc(db, "users", user.uid), {
                         userName: user.displayName,
                         email: user.email,
@@ -51,23 +46,53 @@
                         appData: JSON.parse(localData),
                         lastSync: new Date()
                     }, { merge: true });
-
-                    // تحديث البروفايل المحلي ببيانات جوجل
-                    let profile = JSON.parse(localStorage.getItem("sfr_profile")) || {};
-                    profile.name = user.displayName;
-                    profile.pic = user.photoURL;
-                    localStorage.setItem("sfr_profile", JSON.stringify(profile));
-                    
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'تم المزامنة!',
-                        text: `أهلاً يا ${user.displayName}، بياناتك الآن في أمان على السحاب.`,
-                        confirmButtonColor: '#6366f1'
-                    }).then(() => location.reload());
+                    console.log("Data synced successfully!");
+                } catch (e) {
+                    console.error("Sync Error:", e);
                 }
+            }
+        }
+
+        // مراقبة حالة تسجيل الدخول وتحديث الواجهة تلقائياً
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // تحديث بيانات البروفايل محلياً من بيانات جوجل
+                let profile = JSON.parse(localStorage.getItem("sfr_profile")) || {};
+                profile.name = user.displayName;
+                profile.pic = user.photoURL;
+                localStorage.setItem("sfr_profile", JSON.stringify(profile));
+                
+                // لو البيانات اتغيرت محلياً، ارفعها للسحاب
+                syncDataToCloud(user);
+                
+                // تحديث الواجهة (اختياري)
+                if(typeof loadProfileUI === 'function') loadProfileUI();
+                if(typeof checkLoginNotif === 'function') checkLoginNotif();
+            }
+        });
+
+        // دالة تسجيل الدخول ونقل البيانات للسحاب
+        window.loginWithGoogle = async function() {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                await syncDataToCloud(user);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم الربط بنجاح!',
+                    text: `أهلاً يا ${user.displayName}، حسابك مربوط الآن بالسحاب.`,
+                    confirmButtonColor: '#6366f1'
+                }).then(() => location.reload());
+                
             } catch (error) {
                 console.error("Firebase Login Error:", error);
-                Swal.fire('خطأ', 'فشل الاتصال بسيرفرات جوجل', 'error');
+                // رسالة خطأ ذكية
+                let errorMsg = 'فشل الاتصال بسيرفرات جوجل';
+                if(error.code === 'auth/popup-blocked') errorMsg = 'الرجاء السماح بالنوافذ المنبثقة (Popups) للمتصفح';
+                
+                Swal.fire('خطأ في الاتصال', errorMsg, 'error');
             }
         }
     </script>
@@ -1008,4 +1033,5 @@
 </script>
 </body>
 </html>
+
 
