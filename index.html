@@ -17,11 +17,13 @@
         /* ستايل رسالة التنبيه الاحترافية - أضفه هنا */
     #migration-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: #020617; z-index: 99999; display: none;
+        background: #020617; z-index: 99999; display: flex;
         flex-direction: column; align-items: center; justify-content: center;
         padding: 20px; text-align: center; color: white; font-family: 'Cairo', sans-serif;
     }
     .migration-card {
+        display: flex;
+        flex-direction: column; align-items: center;
         background: #1e293b; padding: 30px; border-radius: 30px;
         border: 1px solid #6366f1; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         max-width: 500px; width: 90%;
@@ -387,7 +389,7 @@
     <div class="migration-card">
         <div style="font-size: 50px;">🚀</div>
         <h2 id="msg-title">تحديث هام جداً</h2>
-        <p id="msg-body"><b></، نحن ننتقل الآن إلى النسخة الرسمية (APK) لتوفير أداء أسرع وأمان أقوى.</p>
+        <p id="msg-body"> <p>نحن ننتقل الآن إلى النسخة الرسمية (APK) لتوفير أداء أسرع وأمان أقوى.</p>
         
         <div class="countdown-timer" id="timer">48:00:00</div>
         
@@ -395,7 +397,7 @@
             ⚠️ تنبيه: نظراً للتحديثات الأمنية الجديدة، سيتم بدء نظام بيانات جديد (تصفير البيانات السابقة).
         </div>
 
-        <a href="https://github.com/yassomohab610-arch/SFR-Simple-Finance-Record-Yassin-Mohab/raw/refs/heads/main/app-release.apk" class="download-btn">📥 تحميل تطبيق APK الآن</a>
+        <a href="https://github.com/yassomohab610-arch/SFR-Simple-Finance-Record-Yassin-Mohab/raw/main/app-release.apk" class="download-btn">📥 تحميل تطبيق APK الآن</a>
         
         <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.6;">يرجي مسح هذه النسخة علي الفور بعد تحميل النسخة الجديدة</p>
     </div>
@@ -1024,6 +1026,7 @@
 </script>
 </body>
 </html>
+
 
 
 
