@@ -14,14 +14,12 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-      
         /* ستايل رسالة التنبيه الاحترافية - أضفه هنا */
     #migration-overlay {
-        position: fixed; top: 0; left: 0; width: 100; height: 100;
+        position: fixed; top: 0; left: 0; width: 100vh; height: 100vh;
         background: #020617; z-index: 99999; display: flex;
         flex-direction: column; align-items: center; justify-content: center;
-        margin: 0%;
-        padding: 0px; text-align: center; color: white; font-family: 'Cairo', sans-serif;
+        padding: 20px; text-align: center; color: white; font-family: 'Cairo', sans-serif;
     }
     .migration-card {
         background: #1e293b; padding: 30px; border-radius: 30px;
@@ -43,10 +41,8 @@
     .data-warning {
         background: rgba(245, 158, 11, 0.1); color: #f59e0b;
         padding: 15px; border-radius: 15px; margin-top: 20px; font-size: 0.9rem;
-
-    
-
-    :root { 
+    }
+        :root { 
             --primary: #6366f1; 
             --primary-hover: #4f46e5;
             --primary-light: rgba(99, 102, 241, 0.1);
@@ -392,7 +388,7 @@
     <div class="migration-card">
         <div style="font-size: 50px;">🚀</div>
         <h2 id="msg-title">تحديث هام جداً</h2>
-        <p id="msg-body">نحن ننتقل للنسخة الرسمية لتوفير أداء اسرع وأمان أقوي.</p>
+        <p id="msg-body">نحن ننتقل للنسخة الرسمية لتوفير اداء اسرع وامان اقوي.</p>
         
         <div class="countdown-timer" id="timer">48:00:00</div>
         
@@ -400,20 +396,11 @@
             ⚠️ تنبيه: نظراً للتحديثات الأمنية الجديدة، سيتم بدء نظام بيانات جديد (تصفير البيانات السابقة).
         </div>
 
-        <a href="https://github.com/yassomohab610-arch/SFR-Simple-Finance-Record-Yassin-Mohab/raw/refs/heads/main/SFR%20Simple%20Finance%20Record.apk.apk" class="download-btn">📥 تحميل تطبيق APK الآن</a>
+        <a href="#" class="download-btn">📥 تحميل تطبيق APK الآن</a>
         
         <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.6;">يرجي مسح هذه النسخة علي الفور بعد تحميل النسخة الجديدة</p>
     </div>
 </div>
-
-<div id="error-overlay">
-    <div class="error-card">
-        <div class="error-icon">📶</div>
-        <h2>عفواً، لا يوجد اتصال بالإنترنت</h2>
-        <p>No Internet Connection<br>يرجى التأكد من اتصالك بالشبكة والمحاولة مرة أخرى</p>
-        <button class="retry-btn" onclick="window.location.reload()">إعادة المحاولة / Retry</button>
-    </div>
-</div> 
 
 <div id="login-notif">
     <span id="ui-login-text">Login now to set your name and photo!</span>
