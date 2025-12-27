@@ -11,40 +11,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ستايل رسالة التنبيه الاحترافية - أضفه هنا */
-    #migration-overlay {
-        position: fixed; top: 0; left: 0; width: 100; height: 100vh;
-        background: #020617; z-index: 99999; display: flex;
-        flex-direction: column; align-items: center; justify-content: center;
-        margin: 0%;
-        padding: 0px; text-align: center; color: white; font-family: 'Cairo', sans-serif;
-    }
-    .migration-card {
-        background: #1e293b; padding: 30px; border-radius: 30px;
-        border: 1px solid #6366f1; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        max-width: 500px; width: 90%;
-        align-items:center:
-        justify-content:center;
-        text-align: center;
-    }
-    .countdown-timer {
-        font-size: 2rem; font-weight: 800; color: #ef4444;
-        margin: 20px 0; background: rgba(239, 68, 68, 0.1);
-        padding: 10px; border-radius: 15px; border: 1px dashed #ef4444;
-    }
-    .download-btn {
-        background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
-        color: white; padding: 18px 30px; border-radius: 20px;
-        text-decoration: none; font-weight: 800; display: inline-block;
-        margin-top: 20px; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-    }
-    .data-warning {
-        background: rgba(245, 158, 11, 0.1); color: #f59e0b;
-        padding: 15px; border-radius: 15px; margin-top: 20px; font-size: 0.9rem;
-    }
         :root { 
             --primary: #6366f1; 
             --primary-hover: #4f46e5;
@@ -82,7 +51,7 @@
         .welcome-container { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
         .mini-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; display: none; }
         .welcome-msg { font-size: 0.95rem; color: #64748b; font-weight: 600; }
-
+        
         #profile-page {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg); z-index: 15000; overflow-y: auto; padding: 20px; box-sizing: border-box;
@@ -129,7 +98,7 @@
         }
 
         .footer-custom { margin-top: 60px; padding: 40px 20px; border-top: 1px solid var(--accent); text-align: center; }
-
+        
         .dev-info {
             display: flex;
             justify-content: center;
@@ -204,7 +173,7 @@
         @keyframes menuSlide { from { opacity: 0; transform: translateY(-10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
         /* New Exit Animation */
         @keyframes menuSlideOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-10px) scale(0.95); } }
-
+        
         .app-container { animation: fadeIn 0.8s ease-out; }
         .privacy-active .blur-val { filter: blur(10px); transition: filter 0.3s ease; }
 
@@ -224,7 +193,7 @@
         .app-container { display: none; padding: 15px; max-width: 1200px; margin: auto; }
 
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-
+        
         .menu-dot-btn { 
             background: var(--card); border: 1px solid var(--accent); font-size: 20px; cursor: pointer; color: var(--text); 
             width: 45px; height: 45px; border-radius: 12px; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
@@ -257,7 +226,7 @@
         body.rtl .dropdown-menu button:hover { transform: translateX(-5px); }
 
         .account-dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 25px; }
-
+        
         .stat-card { background: var(--card); padding: 18px; border-radius: 22px; text-align: center; border: 1px solid var(--accent); box-shadow: var(--shadow); transition: transform 0.3s ease; }
         .stat-card:hover { transform: translateY(-5px); }
 
@@ -265,7 +234,7 @@
         @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } }
 
         .card { background: var(--card); padding: 22px; border-radius: 26px; border: 1px solid var(--accent); margin-bottom: 20px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
-
+        
         input, select { 
             width: 100%; padding: 14px 18px; margin-bottom: 16px; border-radius: 16px; 
             border: 2px solid var(--border); background: var(--bg); color: var(--text); 
@@ -332,7 +301,7 @@
         body.rtl .item { border-left: none; border-right: 6px solid var(--primary); }
 
         .hist-cat { font-weight: 600; font-size: 1rem; }
-
+        
         .search-container { position: relative; margin-bottom: 20px; }
         .search-input { padding-left: 45px !important; border-radius: 16px !important; border: 1px solid var(--border) !important; }
         /* Added search input focus style */
@@ -387,24 +356,6 @@
     <div id="lock-error">⚠️ Wrong Password!</div>
 </div>
 
-<div id="migration-overlay">
-    <div class="migration-card">
-        <div style="font-size: 50px;">🚀</div>
-        <h2 id="msg-title">تحديث هام جداً</h2>
-        <p id="msg-body">نحن ننتقل للنسخة الرسمية لتوفير اداء اسرع وامان اقوي.</p>
-        
-        <div class="countdown-timer" id="timer">48:00:00</div>
-        
-        <div class="data-warning">
-            ⚠️ تنبيه: نظراً للتحديثات الأمنية الجديدة، سيتم بدء نظام بيانات جديد (تصفير البيانات السابقة).
-        </div>
-
-        <a href="https://github.com/yassomohab610-arch/SFR-Simple-Finance-Record-Yassin-Mohab/raw/refs/heads/main/SFR%20Simple%20Finance%20Record.apk.apk" class="download-btn">📥 تحميل تطبيق APK الآن</a>
-        
-        <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.6;">يرجي مسح هذه النسخة علي الفور بعد تحميل النسخة الجديدة</p>
-    </div>
-</div>
-
 <div id="login-notif">
     <span id="ui-login-text">Login now to set your name and photo!</span>
     <button onclick="openProfile()" style="background: white; color: var(--primary); border:none; padding: 6px 14px; border-radius: 10px; font-weight: 800; cursor:pointer; font-size: 0.8rem;">LOG IN</button>
@@ -417,12 +368,12 @@
             <img id="profile-pic-preview" src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Profile">
             <input type="file" id="pic-upload" hidden accept="image/*" onchange="previewImage(this)">
         </div>
-
+        
         <div class="profile-input-group">
             <label id="ui-label-name">Full Name</label>
             <input type="text" id="prof-name" placeholder="Enter your name...">
         </div>
-
+        
         <button class="btn-primary" onclick="saveProfile()" id="ui-prof-save">Save & Apply</button>
         <button class="btn-tool" onclick="closeProfile()" style="width:100%; margin-top:12px; padding: 15px;" id="ui-prof-close">Back</button>
     </div>
@@ -490,13 +441,13 @@
 
                     <div style="margin-bottom: 5px;"><small id="ui-label-cat" style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">CATEGORY / الفئة</small></div>
                     <select id="catSelect"></select>
-
+                    
                     <div style="margin-bottom: 5px;"><small id="ui-label-det" style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">DETAILS / التفاصيل</small></div>
                     <input id="descInp" placeholder="What is this for?">
-
+                    
                     <div style="margin-bottom: 5px;"><small id="ui-label-amt" style="font-weight: 700; color: var(--primary); opacity: 0.8; margin-left: 5px;">AMOUNT / المبلغ</small></div>
                     <input type="number" id="amtInp" placeholder="0.00" step="0.01" required>
-
+                    
                     <button class="btn-primary" id="ui-save">Post to SFR</button>
                 </form>
             </div>
@@ -506,7 +457,7 @@
                 <h3 id="ui-hist">History</h3>
                 <select id="monthFilter" style="width:auto; margin:0"></select>
             </div>
-
+            
             <div class="search-container">
                 <span class="search-icon">🔍</span>
                 <input type="text" id="searchInput" class="search-input" placeholder="Search by name or description..." oninput="render()">
@@ -534,25 +485,25 @@
             <button onclick="calcPop()">⌫</button>
             <button onclick="calcIn('/')" class="op">÷</button>
             <button onclick="calcIn('*')" class="op">×</button>
-
+            
             <button onclick="calcIn('7')">7</button>
             <button onclick="calcIn('8')">8</button>
             <button onclick="calcIn('9')">9</button>
             <button onclick="calcIn('-')" class="op">-</button>
-
+            
             <button onclick="calcIn('4')">4</button>
             <button onclick="calcIn('5')">5</button>
             <button onclick="calcIn('6')">6</button>
             <button onclick="calcIn('+')" class="op">+</button>
-
+            
             <button onclick="calcIn('1')">1</button>
             <button onclick="calcIn('2')">2</button>
             <button onclick="calcIn('3')">3</button>
             <button onclick="calcRes()" class="eq">=</button>
-
+            
             <button onclick="calcIn('0')" style="grid-column: span 2;">0</button>
             <button onclick="calcIn('.')">.</button>
-
+            
             <button onclick="closeCalc()" style="grid-column: span 4; background:#64748b; color:white; margin-top:10px; padding: 12px;">Close / إغلاق</button>
         </div>
     </div>
@@ -561,20 +512,20 @@
 <div id="privacy-modal">
     <div class="privacy-content" style="max-width:800px; margin:auto; padding:20px;">
         <button class="btn-primary" onclick="closePrivacy()" style="margin-bottom: 25px;">Close / إغلاق</button>
-
+        
         <div class="privacy-section">
             <h2>Privacy Policy & Data Transparency</h2>
             <p><strong>SFR (Simple Finance Record)</strong> was developed by <strong>Yassin Mohab Mohamed</strong> with a "Privacy-First" philosophy.</p>
-
+            
             <h3>1. Local Data Sovereignty</h3>
             <p>Your financial data is yours alone. All records, transaction history, account names, and profile information are stored strictly within your device's <strong>LocalStorage</strong> (browser memory). We do not own, manage, or have any technical means to access your data.</p>
-
+            
             <h3>2. Zero Cloud Connectivity</h3>
             <p>To ensure maximum security, this application operates without any external servers or cloud databases. There is no background synchronization; your data never leaves your physical device.</p>
-
+            
             <h3>3. Advertising & Analytics</h3>
             <p>We utilize <strong>Google AdMob</strong> to provide non-intrusive advertisements. These third-party services may collect anonymous device identifiers to serve relevant ads, governed by Google’s own privacy policies.</p>
-
+            
             <h3>4. Permissions & Security</h3>
             <p>The app does not require access to your camera, contacts, or location. The "App Lock" feature is a local security layer intended to prevent unauthorized physical access to the app on your device.</p>
         </div>
@@ -584,20 +535,20 @@
         <div class="privacy-section" dir="rtl">
             <h2>سياسة الخصوصية وشفافية البيانات</h2>
             <p>تم تطوير تطبيق <strong>SFR</strong> بواسطة المبرمج <strong>ياسين مهاب محمد</strong> مع الالتزام التام بحماية خصوصية المستخدم.</p>
-
+            
             <h3>١. سيادة البيانات المحلية</h3>
             <p>بياناتك المالية ملك لك وحدك. يتم تخزين جميع السجلات، تاريخ المعاملات، وأسماء الحسابات حصرياً في ذاكرة المتصفح المحلية (LocalStorage) الخاصة بجهازك. لا نملك أي وسيلة تقنية للوصول إلى هذه البيانات أو الاطلاع عليها.</p>
-
+            
             <h3>٢. انعدام الاتصال السحابي</h3>
             <p>لضمان أقصى درجات الأمان، يعمل التطبيق بدون أي خوادم خارجية أو قواعد بيانات سحابية. لا توجد مزامنة خلفية؛ بياناتك لا تغادر جهازك الفعلي أبداً.</p>
-
+            
             <h3>٣. الإعلانات والتحليلات</h3>
             <p>نستخدم خدمة <strong>Google AdMob</strong> لعرض الإعلانات. قد تقوم هذه الخدمات بجمع معرفات أجهزة مجهولة لتقديم إعلانات ذات صلة، وذلك وفقاً لسياسات خصوصية شركة Google.</p>
-
+            
             <h3>٤. التصاريح والأمان</h3>
             <p>لا يتطلب التطبيق الوصول إلى الكاميرا أو الأسماء أو الموقع الجغرافي. خاصية "قفل التطبيق" هي طبقة حماية محلية تهدف لمنع الوصول الفعلي غير المصرح به للتطبيق على جهازك.</p>
         </div>
-
+        
         <p style="text-align:center; opacity:0.6; font-size:0.8rem; margin-top:20px;">Last Updated: December 2025</p>
     </div>
 </div>
@@ -663,7 +614,7 @@
         if(e) e.stopPropagation();
         const d = document.getElementById("dropdown"); 
         const btn = document.getElementById("menuBtn");
-
+        
         if (d.style.display === "block") {
             closeMenuEverywhere(); // Use the animated close function
         } else {
@@ -679,7 +630,7 @@
         if (d && d.style.display === "block" && !d.classList.contains("closing")) {
             d.classList.add("closing");
             if(btn) btn.classList.remove("active");
-
+            
             // Wait for animation to finish before hiding display
             setTimeout(() => {
                 d.style.display = "none";
@@ -733,7 +684,7 @@
         document.getElementById("ui-dev-by").innerText = d.devBy;
         document.getElementById("lock-error").innerText = d.loginErr;
         document.getElementById("searchInput").placeholder = d.searchPlace;
-
+        
         document.getElementById("ui-menu-profile").innerText = d.menuProf;
         document.getElementById("ui-profile-title").innerText = d.profTitle;
         document.getElementById("ui-label-name").innerText = d.labelName;
@@ -762,7 +713,7 @@
     function openProfile() { document.getElementById("profile-page").style.display = "block"; closeMenuEverywhere(); }
     function closeProfile() { document.getElementById("profile-page").style.display = "none"; }
     function triggerPicUpload() { document.getElementById("pic-upload").click(); }
-
+    
     function previewImage(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
@@ -786,7 +737,7 @@
     function loadProfileUI() {
         document.getElementById("prof-name").value = profileData.name;
         const miniPic = document.getElementById("mini-profile-pic");
-
+        
         if(profileData.pic) {
             document.getElementById("profile-pic-preview").src = profileData.pic;
             miniPic.src = profileData.pic;
@@ -797,7 +748,7 @@
         } else {
             miniPic.style.display = "none";
         }
-
+        
         if(profileData.name) {
             document.getElementById("welcome-area").innerText = `${dict[lang].welcome}, ${profileData.name}`;
         } else {
@@ -822,11 +773,11 @@
     function render() {
         const accSel = document.getElementById("accSelect"); accSel.innerHTML = ""; accounts.forEach((a, i) => { const o = document.createElement("option"); o.value = i; o.text = a.name; accSel.appendChild(o); }); accSel.value = currentIdx;
         let gInc = 0, gExp = 0, gNet = 0; accounts.forEach(acc => { let accNet = acc.initial; acc.transactions.forEach(t => { if(t.type === "income") { gInc += t.amt; accNet += t.amt; } else { gExp += t.amt; accNet -= t.amt; } }); gNet += accNet; });
-
+        
         const cur = accounts[currentIdx]; 
         const filter = document.getElementById("monthFilter").value; 
         const searchQuery = document.getElementById("searchInput").value.toLowerCase();
-
+        
         let cInc = 0, cExp = 0; 
         const list = document.getElementById("transList"); 
         list.innerHTML = "";
@@ -834,7 +785,7 @@
         cur.transactions.forEach((t, i) => {
             const tDate = new Date(t.date);
             const matchesMonth = filter === "all" || tDate.getMonth() == filter;
-
+            
             // Logic for date search
             const dateStr = tDate.toLocaleDateString(lang==='ar'?'ar-EG':'en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toLowerCase();
             const fullIsoDate = tDate.toISOString().split('T')[0];
@@ -877,7 +828,7 @@
             setType('expense');
         } 
     }
-
+    
     function save() { localStorage.setItem("sfr_v6_data", JSON.stringify(accounts)); }
     function switchAccount() { currentIdx = parseInt(document.getElementById("accSelect").value); render(); }
 
@@ -995,36 +946,6 @@
 
     function openPrivacy() { document.getElementById("privacy-modal").style.display = "block"; }
     function closePrivacy() { document.getElementById("privacy-modal").style.display = "none"; }
-</script>
-<script>
-    // ده كود "كشف الهوية" والتحكم في الرسالة
-    window.addEventListener('load', () => {
-        // لو المستخدم داخل من الـ APK (اللي هنبرمجه يبعت البصمة دي)
-        const isNative = navigator.userAgent.includes("SFR_NATIVE");
-        const overlay = document.getElementById("migration-overlay");
-
-        if (!isNative) {
-            // لو داخل من متصفح عادي.. وريه الرسالة
-            overlay.style.display = "flex";
-            
-            // شغل العد التنازلي
-            let hours = 48, minutes = 0, seconds = 0;
-            const timerEl = document.getElementById("timer");
-            setInterval(() => {
-                if (seconds > 0) seconds--;
-                else {
-                    if (minutes > 0) { minutes = 59; seconds = 59; }
-                    else {
-                        if (hours > 0) { hours--; minutes = 59; seconds = 59; }
-                    }
-                }
-                timerEl.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            }, 1000);
-        } else {
-            // لو داخل من الـ APK.. اخفي الرسالة فوراً وشغل التطبيق
-            overlay.style.display = "none";
-        }
-    });
 </script>
 </body>
 </html>
